@@ -239,9 +239,11 @@ body {
   border-radius: 8px;
   padding: 11px 13px;
   margin-bottom: 9px;
-  transition: border-color 0.18s;
+  transition: border-color 0.18s, background 0.18s;
 }
-.signal-card:hover { border-color: #5d5dbf; }
+.signal-card.has-link { cursor: pointer; }
+.signal-card.has-link:hover { border-color: #5d5dbf; background: #f4f4fc; }
+.signal-card.has-link:hover .signal-title { color: #3d3d8f; }
 
 .signal-top {
   display: flex;
@@ -435,7 +437,8 @@ const SIGNALS = {
       { kind: "interpretation", date: "17 Apr 2026",
         title: "Ethiopia thermal import ban produces early EV uptake signal",
         text: "Six months after Ethiopia's thermal vehicle import restriction, EV penetration has risen from under 1% to 3% — the fastest adoption curve on the continent, driven by 17 local assembly operations.",
-        source: "TechCabal", mechanism: null }
+        source: "TechCabal", mechanism: null,
+        url: "https://techcabal.com/2026/05/26/francophone-weekly-by-techcabal-024/" }
     ],
     gitc: [
       { kind: "finding", date: "2 Apr 2026",
@@ -449,7 +452,8 @@ const SIGNALS = {
       { kind: "finding", date: "19 Apr 2026",
         title: "SA social welfare NGO funding gap widens to R4.2 billion",
         text: "Parliamentary testimony confirms 90% of South Africa's social welfare services are delivered by NGOs, with an aggregate funding shortfall of R4.2bn against contracted delivery obligations.",
-        source: "ISS Today", mechanism: null }
+        source: "ISS Today", mechanism: null,
+        url: "https://issafrica.org/iss-today/dear-mr-president-to-succeed-sa-needs-an-excellent-social-development-minister" }
     ],
     ci: [
       { kind: "observation", date: "8 Apr 2026",
@@ -472,45 +476,55 @@ const SIGNALS = {
       { kind: "finding", date: "1 May 2026",
         title: "Zimbabwe: first battery-grade lithium sulfate exported from Africa",
         text: "Zhejiang Huayou Cobalt exports the first consignment of battery-grade lithium sulfate from Prospect Lithium Zimbabwe — the first processed critical mineral at this specification level shipped from any African country. Plant powered by 130MW off-grid solar, resolving the electricity constraint through captive renewable infrastructure.",
-        source: "China–Global South Project", mechanism: "Raw Ore Export Bans" },
+        source: "China–Global South Project", mechanism: "Raw Ore Export Bans",
+        url: "https://traffic.libsyn.com/secure/b3f2a027-658f-4f2b-812a-d8c56346e481/CAP_05012026_Libsyn.mp3" },
       { kind: "finding", date: "27 May 2026",
         title: "Dangote Refinery cuts Nigeria's fuel import bill by 54% in one year",
         text: "Nigeria's fuel import spend fell from $2.6bn (Q1 2024) to $1.2bn (Q1 2025) after Dangote reached operational scale — 45M litres/day loading capacity, now exporting refined products to Côte d'Ivoire, Cameroon, Tanzania, Ghana, and Togo. African private capital displacing the European refining intermediary architecture.",
-        source: "African Arguments", mechanism: "Raw Ore Export Bans" },
+        source: "African Arguments", mechanism: "Raw Ore Export Bans",
+        url: "https://africanarguments.org/2026/05/the-dangote-refinery-and-the-end-of-africas-engineered-dependency/" },
       { kind: "interpretation", date: "27 May 2026",
         title: "NNPC deliberate crude shortfall to Dangote: institutional resistance in action",
         text: "Sources confirm NNPC's delivery shortfall under the naira-for-crude agreement is deliberate. The Crude Oil Refinery Owners Association accuses international traders of dumping substandard products to protect import margins. The resistance to Dangote's operational success is the live case study in what downstream processing battles look like.",
-        source: "Nairametrics / African Arguments", mechanism: "Fiscal Optimisations" },
+        source: "Nairametrics / African Arguments", mechanism: "Fiscal Optimisations",
+        url: "https://africanarguments.org/2026/05/the-dangote-refinery-and-the-end-of-africas-engineered-dependency/" },
       { kind: "finding", date: "25 May 2026",
         title: "Beneficiation-electricity gap: the 'Zimbabwe pattern writ large'",
         text: "Energy Transition Africa analysis names the structural risk: mandating local processing without industrial-scale electricity fails, leaving processing capacity to the best-capitalised foreign operators. First Quantum has built 430MW of captive renewable in Zambia — more than most African countries add to national grids in a year.",
-        source: "Energy Transition Africa", mechanism: "Raw Ore Export Bans" },
+        source: "Energy Transition Africa", mechanism: "Raw Ore Export Bans",
+        url: "https://www.energytransitionafrica.com/insights/article/africa-minerals-beneficiation-electricity-infrastructure-planning-2026" },
       { kind: "observation", date: "26 May 2026",
         title: "Quad critical minerals framework — assessed as extraction-focused",
         text: "The Quad (US, Australia, India, Japan) announces a critical minerals framework. Zainab Usman (Columbia) characterises US bilateral deals as extraction-focused, with DFC funding directed at junior mining startups rather than refining infrastructure. Neither great-power pole is offering the processing partnership the beneficiation agenda requires.",
-        source: "Daily Maverick / China in Africa", mechanism: "Mandatory State Equity" },
+        source: "Daily Maverick / China in Africa", mechanism: "Mandatory State Equity",
+        url: "https://traffic.libsyn.com/secure/b3f2a027-658f-4f2b-812a-d8c56346e481/CAP_05292026_Libsyn.mp3" },
       { kind: "finding", date: "25 May 2026",
         title: "SA Lithium Highbury mine: 800 displaced, blasting before resettlement agreement",
         text: "Mining and blasting at SA Lithium's KZN expansion commenced before any resettlement agreement with 800 affected residents. 34% of nearby households report respiratory complaints. EIA application under legal challenge at NCOP. The old extraction terms operating in parallel with the new ones.",
-        source: "Daily Maverick", mechanism: "Regulatory Purges" },
+        source: "Daily Maverick", mechanism: "Regulatory Purges",
+        url: "https://www.dailymaverick.co.za/article/2026-05-25-nearly-1000-people-face-relocation-in-kzn-lithium-mine-expansion-plan-/" },
       { kind: "interpretation", date: "29 May 2026",
         title: "China: 99% gallium, 70% lithium, 91% rare earth processing dominance",
         text: "China's global critical mineral processing shares: gallium 99%, rare earths 91%, graphite 96%, silicon 85%, cobalt 78%, lithium 70%. Great-power competition is positioning Africa as an extraction source for both poles. For African governments, the offer from both sides remains access over processing partnership.",
-        source: "China in Africa", mechanism: "Mandatory State Equity" },
+        source: "China in Africa", mechanism: "Mandatory State Equity",
+        url: "https://traffic.libsyn.com/secure/b3f2a027-658f-4f2b-812a-d8c56346e481/CAP_05292026_Libsyn.mp3" },
       { kind: "observation", date: "28 May 2026",
         title: "Morocco named Africa's leading industrial economy; $4.57bn in automotive exports",
         text: "AfDB Industrial Investment Barometer confirms Morocco as Africa's leading industrial economy. North Africa attracted 56% of continental industrial investment 2020–2025. The Morocco model — port infrastructure, anchor OEM, then local content — is the sequencing reference now cited in client conversations.",
-        source: "Energy Transition Africa / AfDB", mechanism: "Fiscal Optimisations" }
+        source: "Energy Transition Africa / AfDB", mechanism: "Fiscal Optimisations",
+        url: "https://www.energytransitionafrica.com/insights/article/morocco-africa-leading-industrial-economy-afdb-index-ocp-guarantee-2026" }
     ],
     er: [
       { kind: "finding", date: "26 May 2026",
         title: "Ethiopia EV penetration reaches 8% — leapfrog confirmed",
         text: "Two years after the thermal import restriction, Ethiopia's EV penetration is at 8%, with 17 local assembly plants operational. Ethiopia accounts for one-third of all African Chinese EV imports in 2025 — the clearest working demonstration of the leapfrog thesis in transport.",
-        source: "TechCabal", mechanism: null },
+        source: "TechCabal", mechanism: null,
+        url: "https://techcabal.com/2026/05/26/francophone-weekly-by-techcabal-024/" },
       { kind: "interpretation", date: "25 May 2026",
         title: "Mobile money's structural ceiling: self-cannibalising margins",
         text: "Cash-in/out revenues declining as merchant and settlement flows grow, compressing margins without expanding the model. Samora Kariuki (Frontier Fintech): 'structurally self-cannibalising — as each operator deepens, it trades its most profitable activity for thinner flows.' M-Pesa financial services still under 6% of revenue despite $11bn disbursed via Fuliza.",
-        source: "Frontier Fintech", mechanism: null },
+        source: "Frontier Fintech", mechanism: null,
+        url: "https://frontierfintech.substack.com/p/121-a-mature-industry-searching-for" },
       { kind: "finding", date: "26 May 2026",
         title: "Francophone West Africa EV market structurally uninvestable at 22–28% WACC",
         text: "Most Francophone West African markets face 22–28% WACC for clean energy assets; no commercial bank accepts EVs as collateral. Ethiopia's leapfrog is not being replicated — the financing architecture gap is widening between early movers and the rest.",
@@ -524,7 +538,8 @@ const SIGNALS = {
       { kind: "observation", date: "27 May 2026",
         title: "Nigeria CCUS: 10.7GT storage capacity, zero operational licences",
         text: "Nigeria holds an estimated 10.7 gigatonne of underground CO2 storage capacity with a comprehensive legislative architecture — but no unified pore space ownership framework and zero operational CCUS licences issued. Commercial gap: $50–100/tonne capture costs vs. sub-$20 voluntary carbon credits makes standalone storage unviable without state intervention.",
-        source: "Energy Transition Africa", mechanism: null },
+        source: "Energy Transition Africa", mechanism: null,
+        url: "https://www.energytransitionafrica.com/insights/article/nigeria-ccus-carbon-capture-transition-economics-governance-2026" },
       { kind: "finding", date: "25 May 2026",
         title: "SA Social Development Minister fired; 90% of services delivered by underfunded NGOs",
         text: "Minister Sisisi Tolashe fired on 14 May. Parliamentary testimony confirms approximately 90% of South Africa's social welfare services are NGO-delivered, with a structural gap between contracted delivery and actual disbursements. Policy text and operational delivery are the constraint.",
@@ -534,11 +549,13 @@ const SIGNALS = {
       { kind: "finding", date: "1 May 2026",
         title: "China pressures Zambia to cancel RightsCon 2026 — five days before it begins",
         text: "Zambia cancels RightsCon 2026 under Chinese diplomatic pressure five days before the event. 130 organisations condemn the cancellation; UNESCO relocates its World Press Freedom Day conference online. The same Chinese capital is embedded in the Tazara and Lobito mineral corridors through Zambia. The Shift 3/4 collision is now concrete, not theoretical.",
-        source: "404 Media", mechanism: null },
+        source: "404 Media", mechanism: null,
+        url: "https://www.404media.co/china-pressured-zambia-to-cancel-rightscon-2026/" },
       { kind: "finding", date: "29 May 2026",
         title: "Deepfake fraud: from fake returns to institutional impersonation",
         text: "MJ Givens Kgasi (Octa): deepfake fraud has moved from unrealistic-returns schemes to actively hijacking names and faces of trusted institutions — a qualitative shift that represents the deterioration of the informational environment the digital civic rails depend on.",
-        source: "Daily Maverick", mechanism: null },
+        source: "Daily Maverick", mechanism: null,
+        url: "https://www.dailymaverick.co.za/article/2026-05-29-deepfake-fraud-is-rewriting-the-rules-of-online-financial-scams/" },
       { kind: "observation", date: "25 May 2026",
         title: "Digital Africa: WhatsApp, Kenya youth networks, Nigerian mediatech form grassroots layer",
         text: "ORF/GP-ORF 'Digital Africa: Tales of Transformation' documents Kenyan youth digital literacy outside formal systems, WhatsApp expenditure accountability in Tanzania, and Nigerian mediatech deepening both transparency and disinformation — the civic infrastructure layer being built from below.",
@@ -864,10 +881,14 @@ function renderPanel(key) {
 
   // Signals
   const signalCards = signals.map(s => `
-    <div class="signal-card">
+    <div class="signal-card${s.url ? ' has-link' : ''}"
+         ${s.url ? `onclick="window.open('${s.url}','_blank')"` : ''}>
       <div class="signal-top">
         <span class="signal-kind kind-${s.kind}">${s.kind}</span>
-        <span class="signal-date">${s.date}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="signal-date">${s.date}</span>
+          ${s.url ? `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:0.35;flex-shrink:0;"><path d="M1 9L9 1M9 1H4M9 1V6" stroke="#3d3d8f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+        </div>
       </div>
       <div class="signal-title">${s.title}</div>
       <div class="signal-text">${s.text}</div>
