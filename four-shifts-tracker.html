@@ -302,6 +302,84 @@ body {
 .signals-scroll::-webkit-scrollbar { width: 4px; }
 .signals-scroll::-webkit-scrollbar-track { background: transparent; }
 .signals-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+/* ── Lens toggle ── */
+.lens-toggle {
+  display: flex;
+  gap: 0;
+  padding: 0 22px;
+  background: #fafafa;
+  border-bottom: 1px solid #eeeef5;
+  flex-shrink: 0;
+}
+.lens-btn {
+  padding: 8px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.lens-btn:hover { color: #5d5dbf; }
+.lens-btn.active { color: #3d3d8f; border-bottom-color: #3d3d8f; }
+
+/* ── Sentiment panel ── */
+.sent-heading {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #bbb; margin: 14px 0 8px;
+}
+.sent-divider {
+  border: none; border-top: 1px solid #eeeef5; margin: 14px 0;
+}
+.sent-bar-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+}
+.sent-bar-label {
+  font-size: 11px; color: #555; width: 130px; flex-shrink: 0; line-height: 1.3;
+}
+.sent-bar-stacked {
+  flex: 1; height: 7px; border-radius: 4px; overflow: hidden; display: flex;
+}
+.sent-pos { background: #2a8a5a; }
+.sent-neu { background: #d4c060; }
+.sent-neg { background: #c04040; }
+.sent-count { font-size: 10px; color: #bbb; width: 30px; text-align: right; flex-shrink: 0; }
+.sent-legend {
+  display: flex; gap: 12px; margin: 6px 0 2px; font-size: 10px; color: #999; flex-wrap: wrap;
+}
+.sent-legend-item { display: flex; align-items: center; gap: 4px; }
+.sent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sent-source-note { font-size: 10px; color: #ccc; margin-top: 4px; }
+.sent-mech-clickable { cursor: pointer; border-radius: 5px; padding: 3px 4px; margin: 0 -4px 4px; transition: background 0.15s; }
+.sent-mech-clickable:hover { background: #f4f4fc; }
+.sent-mech-selected { background: #ededf8 !important; }
+.sent-mech-arrow { font-size: 10px; color: #aaa; margin-left: 4px; }
+.sent-drill-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin: 12px 0 6px; display: flex; align-items: center; gap: 6px; }
+.sent-drill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Sentiment story cards */
+.sent-story {
+  background: #fafafa; border: 1.5px solid #ebebf5; border-radius: 8px;
+  padding: 11px 13px; margin-bottom: 8px; cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+}
+.sent-story:hover { border-color: #5d5dbf; background: #f4f4fc; }
+.sent-story:hover .sent-story-headline { color: #3d3d8f; }
+.sent-story-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.sent-story-tag {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 2px 7px; border-radius: 3px; background: #f0ebff; color: #6a30a8;
+}
+.sent-story-date { font-size: 10px; color: #bbb; }
+.sent-story-headline { font-size: 12px; font-weight: 600; color: #12122a; margin-bottom: 4px; line-height: 1.4; }
+.sent-story-summary { font-size: 11px; color: #666; line-height: 1.55; }
+.sent-story-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.sent-story-source { font-size: 10px; color: #bbb; font-style: italic; }
 </style>
 </head>
 <body>
@@ -565,10 +643,174 @@ const SIGNALS = {
 };
 
 // ================================================================
+// SENTIMENT DATA (Zignal Labs · Jun 14 – Jul 13, 2026)
+// ================================================================
+const SENTIMENT_DATA = {
+  period: "Jun 14 – Jul 13, 2026",
+  source: "Zignal Labs",
+  totalMentions: 248,
+  overall: { positive: 48, neutral: 30, negative: 22 },
+  mechanisms: [
+    { label: "Raw Ore Export Bans",    positive: 72, neutral: 18, negative: 10, mentions: 37 },
+    { label: "Mandatory State Equity", positive: 61, neutral: 24, negative: 15, mentions: 22 },
+    { label: "Fiscal Optimisations",   positive: 38, neutral: 25, negative: 37, mentions: 29 },
+    { label: "Regulatory Purges",      positive: 55, neutral: 28, negative: 17, mentions: 18 }
+  ],
+  territories: [
+    { label: "Guinea",   positive: 75, neutral: 15, negative: 10, mentions: 20 },
+    { label: "Ghana",    positive: 65, neutral: 25, negative: 10, mentions: 19 },
+    { label: "Tanzania", positive: 70, neutral: 20, negative: 10, mentions: 10 },
+    { label: "DRC",      positive: 35, neutral: 30, negative: 35, mentions:  6 }
+  ],
+  companies: [
+    { label: "AngloGold Ashanti", positive: 62, neutral: 28, negative: 10, mentions: 103 },
+    { label: "Glencore",          positive: 25, neutral: 30, negative: 45, mentions:  58 },
+    { label: "Rio Tinto",         positive: 50, neutral: 35, negative: 15, mentions:  33 },
+    { label: "Endeavour Mining",  positive: 60, neutral: 28, negative: 12, mentions:  25 },
+    { label: "Newmont",           positive: 52, neutral: 33, negative: 15, mentions:  21 },
+    { label: "Barrick Gold",      positive: 50, neutral: 35, negative: 15, mentions:  14 }
+  ],
+  stories: [
+    {
+      headline: "Guinea bans raw gold exports — regional refinery targets 733 tonnes/yr",
+      summary: "President Doumbouya bans unrefined gold exports from September 2026. Guinea retains under 1% of value from 2.32M oz/yr output dominated by AngloGold Ashanti and Nordgold. UAE-backed $30M refinery structured as regional hub, mirroring the bauxite sector playbook.",
+      source: "Bloomberg", date: "21 Jun 2026", tag: "Raw Ore Export Bans",
+      url: "https://www.bloomberg.com/news/articles/2026-06-21/guinea-s-president-doumbouya-announces-ban-on-raw-gold-exports"
+    },
+    {
+      headline: "DRC engineers cobalt price floor — ARECOMS withdraws unused export quotas",
+      summary: "Unused H1 quotas forfeited and reassigned to state entity. Cobalt up 160% since February 2025 to $57,320/tonne. ARECOMS warns of full quota withdrawal for non-compliant operators — the DRC demonstrating that African governments can set global commodity terms.",
+      source: "mining.com", date: "29 Jun 2026", tag: "Fiscal Optimisations",
+      url: "https://www.mining.com/web/congo-withdraws-unused-cobalt-export-quotas"
+    },
+    {
+      headline: "DRC sets the terms of global competition for critical minerals",
+      summary: "DRC controls ~80% of global cobalt production. Revenues projected at $2.3bn under quota system vs $617M without. Country now pursuing strategic reserves modelled on China and US 'Project Vault' — redefining what sovereignty looks like for a resource-rich state.",
+      source: "mining.com", date: "26 Jun 2026", tag: "Fiscal Optimisations",
+      url: "https://www.mining.com/op-ed-drc-is-setting-the-terms-of-global-competition-for-critical-minerals/"
+    },
+    {
+      headline: "Tanzania's Bank buys 28 tonnes of gold worth $3.68bn in 18 months",
+      summary: "Since September 2024, miners must sell ≥20% of output to the central bank at market rates. Programme drives reserve diversification, stabilises the Tanzanian shilling, and opens 4,000+ new accounts for artisanal miners — a new domestic value-capture mechanism.",
+      source: "Mining Weekly", date: "8 Jul 2026", tag: "Mandatory State Equity",
+      url: "https://www.miningweekly.com/article/tanzanias-central-bank-buys-28-t-of-gold-over-past-18-months-for-reserves-2026-07-08"
+    },
+    {
+      headline: "Burkina Faso grants SOPAMIB permit for Bouboulou gold mine",
+      summary: "Military-led government awards industrial permit to state miner SOPAMIB — first fully state-owned gold mine since Poura closed in 1999. Project: 10.77M tonnes ore, 7.27 tonnes of gold over 15 years, $56M investment, 1,200+ jobs.",
+      source: "mining.com", date: "10 Jul 2026", tag: "Mandatory State Equity",
+      url: "https://www.mining.com/web/burkina-faso-grants-permit-to-state-owned-gold-miner-for-bouboulou-project"
+    },
+    {
+      headline: "Mozambique's 2026 Mining Law: 15% free-carry state stake, export ban by default",
+      summary: "Signed June 3: foreign economic interest capped at 85%, ENM takes 15% non-dilutable free-carry. Raw and semi-processed mineral exports prohibited by default — ministerial approval requires a credible processing transition plan. Chamber warns law deters foreign capital.",
+      source: "Kitco News", date: "18 Jun 2026", tag: "Mandatory State Equity",
+      url: "https://www.kitco.com/news/off-the-wire/2026-06-18/mozambiques-new-mine-ownership-rules-could-deter-foreign-investment"
+    },
+    {
+      headline: "MOTA 2026 Paris: definitive shift from extraction to continental value creation",
+      summary: "9th Mining On Top Africa summit (Paris, 7–8 July): 'definitive paradigm shift from raw extraction to co-development, local value creation, and processing on the continent.' Theme: Securing Africa's Mining Future — Sovereignty, Sustainability, and Global Partnerships.",
+      source: "Financial Afrik", date: "10 Jul 2026", tag: "Raw Ore Export Bans",
+      url: "https://www.financialafrik.com/en/2026/07/10/mota-2026-african-mining-at-the-center-of-industrial-transformation-and-global-value-chains/"
+    },
+    {
+      headline: "The new scramble for African minerals and value addition",
+      summary: "Africa holds 30% of world critical minerals. Saudi Arabia, US, China, EU and India competing for access. African governments and financiers pushing to transform continent from raw material supplier into hub for mineral processing and battery manufacturing.",
+      source: "African Business", date: "24 Jun 2026", tag: "Raw Ore Export Bans",
+      url: "https://african.business/2026/06/resources/the-new-scramble-for-african-minerals-and-value-addition"
+    },
+    {
+      headline: "Ghana stakeholders demand value retention, not just export volumes",
+      summary: "New policy: 100% Ghanaian ownership required in surface mining, 50% in underground by December 2026. Gold Fields repatriated $5bn in 2024, yet much left through imports. Ghana aims to become regional hub for mineral processing and equipment manufacturing.",
+      source: "Ghana Minerals Commission", date: "1 Jul 2026", tag: "Regulatory Purges",
+      url: "https://www.mincom.gov.gh/value-retention-not-just-export-volumes-must-define-ghanas-mining-success/"
+    },
+    {
+      headline: "JSE gold and PGM stocks regain strategic value amid resource nationalism wave",
+      summary: "JSE mining driven by gold-price strength, PGM scarcity, critical minerals demand, and supply-chain security. South Africa controls platinum, palladium, rhodium, chrome, and manganese systems that cannot be quickly replicated. AngloGold Ashanti central to renewed global investor interest.",
+      source: "Mining South East Europe", date: "4 Jul 2026", tag: "Fiscal Optimisations",
+      url: "https://www.miningsee.eu/jse-gold-and-pgm-stocks-regain-strategic-value/"
+    }
+  ],
+  storiesByMechanism: {
+    "Raw Ore Export Bans": {
+      positive: [
+        {
+          headline: "Guinea bans raw gold exports — regional refinery targets 733 tonnes/yr",
+          summary: "President Doumbouya bans unrefined gold exports from September 2026. UAE-backed $30M refinery structured as regional hub. Guinea retains under 1% of value from 2.32M oz/yr output — the ban forces that calculus to change.",
+          source: "Bloomberg", date: "21 Jun 2026",
+          url: "https://www.bloomberg.com/news/articles/2026-06-21/guinea-s-president-doumbouya-announces-ban-on-raw-gold-exports"
+        },
+        {
+          headline: "MOTA 2026 Paris: definitive shift from extraction to continental value creation",
+          summary: "9th Mining On Top Africa summit: 'definitive paradigm shift from raw extraction to co-development and processing on the continent.' Export ban policy framed as enabling step, not an endpoint.",
+          source: "Financial Afrik", date: "10 Jul 2026",
+          url: "https://www.financialafrik.com/en/2026/07/10/mota-2026-african-mining-at-the-center-of-industrial-transformation-and-global-value-chains/"
+        },
+        {
+          headline: "The new scramble for African minerals and value addition",
+          summary: "Africa holds 30% of world critical minerals. Governments pushing to transform continent from raw material supplier into processing hub. Export restriction policies cited as catalysts for inward refinery investment.",
+          source: "African Business", date: "24 Jun 2026",
+          url: "https://african.business/2026/06/resources/the-new-scramble-for-african-minerals-and-value-addition"
+        },
+        {
+          headline: "DRC sets the terms of global competition for critical minerals",
+          summary: "DRC controls ~80% of global cobalt. Quota withdrawal forces state control of export volumes. Revenues projected at $2.3bn under quota vs $617M without — demonstrating that African governments can set global commodity terms.",
+          source: "mining.com", date: "26 Jun 2026",
+          url: "https://www.mining.com/op-ed-drc-is-setting-the-terms-of-global-competition-for-critical-minerals/"
+        }
+      ],
+      neutral: [
+        {
+          headline: "Guinea Opens Talks With Miners to Advance Domestic Gold Refining",
+          summary: "30-day negotiation period begins following ban announcement. Nimba Gold Refinery due this month. Miners seeking transition clarity on timelines and offtake terms — government holding firm on ban while negotiating implementation.",
+          source: "Ecofin Agency", date: "7 Jun 2026",
+          url: "https://www.ecofinagency.com/news-industry/0607-57082-guinea-opens-talks-with-miners-to-advance-domestic-gold-refining"
+        },
+        {
+          headline: "Congo Tax Agency Seals Glencore Mine Offices in Payment Dispute",
+          summary: "DRC's DGI seals KCC offices in Kolwezi over $4.7bn tax claim. Glencore's $60M settlement offer rejected. Pattern: export quota leverage deployed alongside fiscal enforcement — a dual-pressure approach.",
+          source: "Bloomberg", date: "10 Jul 2026",
+          url: "https://www.bloomberg.com/news/articles/2026-07-10/congo-tax-agency-seals-glencore-mine-offices-in-payment-dispute"
+        },
+        {
+          headline: "Guinea eyes regional gold refining hub",
+          summary: "Guinea positions Nimba refinery as regional processing node for West African gold. 90-day transition window as miners adapt supply chains. Analytical coverage balanced — processing ambition credible, execution risk real.",
+          source: "Miningmx", date: "22 Jun 2026",
+          url: "https://www.miningmx.com/news/gold/65791-guinea-eyes-regional-gold-refining-hub/"
+        }
+      ],
+      negative: [
+        {
+          headline: "Guinea's Gold Export Ban Bet Could Backfire",
+          summary: "Risks: immediate revenue shortfall before refinery is operational, diplomatic tension with Swiss and UAE gold buyers, artisanal formalisation challenge. September 2026 deadline seen as optimistic given infrastructure gap.",
+          source: "Business Tech Africa", date: "22 Jun 2026",
+          url: "https://businesstechafrica.co.za/mining/2026/06/22/guineas-gold-export-ban-bet-could-backfire"
+        },
+        {
+          headline: "Congo Orders Cobalt Miners to Give Up Unused Export Quotas",
+          summary: "Supply-chain risk framing: quota clawback adds to already-tight cobalt market. Industry bodies warn quota system deters future investment. Battery manufacturing exposure flagged for US and EU buyers.",
+          source: "SupplyChainBrain", date: "2 Jul 2026",
+          url: "https://www.supplychainbrain.com/articles/44362-congo-orders-cobalt-miners-to-give-up-unused-export-quotas"
+        },
+        {
+          headline: "Congo withdraws unused cobalt export quotas",
+          summary: "ARECOMS forfeits H1 quotas; penalty for non-shippers tightens supply. Market analysts frame as unilateral intervention that undermines long-term contract certainty — cobalt up 160% since Feb 2025.",
+          source: "Reuters / Kitco", date: "29 Jun 2026",
+          url: "https://www.kitco.com/news/off-the-wire/2026-06-29/congo-withdraws-unused-cobalt-export-quotas"
+        }
+      ]
+    }
+  }
+};
+
+// ================================================================
 // STATE
 // ================================================================
 let currentMonth = "May 2026";
 let selectedShift = null;
+let panelView = 'signals';
+let selectedMechanism = null;
 
 // ================================================================
 // RADAR GEOMETRY
@@ -832,27 +1074,71 @@ function drawScoreCards() {
 // ================================================================
 function selectShift(key) {
   selectedShift = key;
+  panelView = 'signals';
+  selectedMechanism = null;
   drawRadar();
   drawScoreCards();
   renderPanel(key);
 }
 
+function setView(view) {
+  panelView = view;
+  selectedMechanism = null;
+  renderPanel(selectedShift);
+}
+
+function setMechanism(name) {
+  selectedMechanism = (selectedMechanism === name) ? null : name;
+  renderPanel(selectedShift);
+}
+
 function renderPanel(key) {
   const panel = document.getElementById('signalsPanel');
   const data = SCORES[currentMonth];
-  const score = data[key];
+  const score = data ? data[key] : null;
   const shifts_meta = SHIFTS.find(s => s.key === key);
-  const signals = (SIGNALS[currentMonth] || {})[key] || [];
 
   const months = MONTHS.filter(m => !FUTURE_MONTHS.includes(m));
   const prevIdx = months.indexOf(currentMonth) - 1;
-  const prevScore = prevIdx >= 0 ? SCORES[months[prevIdx]][key] : null;
-  const diff = prevScore !== null ? score - prevScore : null;
+  const prevScore = (score !== null && prevIdx >= 0) ? SCORES[months[prevIdx]][key] : null;
+  const diff = (score !== null && prevScore !== null) ? score - prevScore : null;
   const diffHtml = diff !== null
     ? `<span class="panel-score-delta ${diff >= 0 ? 'delta-up' : 'delta-down'}">${diff >= 0 ? '+' : ''}${diff} vs ${months[prevIdx]}</span>`
     : '';
 
-  // Resource nationalism block for VS
+  const shiftDisplayName = shifts_meta.label.join(' ');
+  const scoreHtml = score !== null
+    ? `<div class="panel-header-score-row">
+        <span class="panel-score-big">${score}</span>
+        ${diffHtml}
+        <span class="panel-score-max">/ 100</span>
+       </div>`
+    : `<div style="font-size:12px;color:#aaa;margin-top:8px;">Data pending — June report running Monday</div>`;
+
+  // Lens toggle — VS only (sentiment data is VS / resource nationalism focused)
+  const lensHtml = key === 'vs' ? `
+    <div class="lens-toggle">
+      <button class="lens-btn ${panelView === 'signals' ? 'active' : ''}" onclick="setView('signals')">Signals</button>
+      <button class="lens-btn ${panelView === 'sentiment' ? 'active' : ''}" onclick="setView('sentiment')">Sentiment Barometer</button>
+    </div>` : '';
+
+  const contentHtml = (panelView === 'sentiment' && key === 'vs')
+    ? renderSentimentContent()
+    : renderSignalsContent(key, months, prevIdx);
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-header-shift">${shiftDisplayName}</div>
+      <div class="panel-header-desc">${shifts_meta.desc}</div>
+      ${scoreHtml}
+    </div>
+    ${lensHtml}
+    ${contentHtml}
+  `;
+}
+
+function renderSignalsContent(key, months, prevIdx) {
+  // Resource nationalism bars for VS
   let rnHtml = '';
   if (key === 'vs') {
     const rn = RN_SCORES[currentMonth];
@@ -861,25 +1147,25 @@ function renderPanel(key) {
       const rows = Object.entries(rn).map(([label, val]) => {
         const prevVal = prevRn ? prevRn[label] : null;
         const d = prevVal !== null ? val - prevVal : null;
-        const dHtml = d !== null ? `<span style="font-size:9px;font-weight:600;color:${d>0?'#2a7a50':'#aa3333'};margin-left:3px;">${d>0?'+':''}${d}</span>` : '';
+        const dHtml = d !== null
+          ? `<span style="font-size:9px;font-weight:600;color:${d>0?'#2a7a50':'#aa3333'};margin-left:3px;">${d>0?'+':''}${d}</span>`
+          : '';
         return `
           <div class="rn-row">
             <span class="rn-label">${label}</span>
             <div class="rn-bar-track"><div class="rn-bar-fill" style="width:${val}%"></div></div>
             <span class="rn-bar-val">${val}${dHtml}</span>
-          </div>
-        `;
+          </div>`;
       }).join('');
       rnHtml = `
         <div class="rn-section">
           <div class="rn-section-title">Resource nationalism mechanisms</div>
           ${rows}
-        </div>
-      `;
+        </div>`;
     }
   }
 
-  // Signals
+  const signals = (SIGNALS[currentMonth] || {})[key] || [];
   const signalCards = signals.map(s => `
     <div class="signal-card${s.url ? ' has-link' : ''}"
          ${s.url ? `onclick="window.open('${s.url}','_blank')"` : ''}>
@@ -893,32 +1179,156 @@ function renderPanel(key) {
       <div class="signal-title">${s.title}</div>
       <div class="signal-text">${s.text}</div>
       <div class="signal-footer">
-        ${s.mechanism
-          ? `<span class="signal-mechanism">${s.mechanism}</span>`
-          : '<span></span>'}
+        ${s.mechanism ? `<span class="signal-mechanism">${s.mechanism}</span>` : '<span></span>'}
         <span class="signal-source">${s.source}</span>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  const shiftDisplayName = shifts_meta.label.join(' ');
-
-  panel.innerHTML = `
-    <div class="panel-header">
-      <div class="panel-header-shift">${shiftDisplayName}</div>
-      <div class="panel-header-desc">${shifts_meta.desc}</div>
-      <div class="panel-header-score-row">
-        <span class="panel-score-big">${score}</span>
-        ${diffHtml}
-        <span class="panel-score-max">/ 100</span>
-      </div>
-    </div>
+  return `
     ${rnHtml}
     <div class="signals-scroll">
       <div class="signals-section-label">${signals.length} key signals · ${currentMonth}</div>
       ${signalCards}
-    </div>
-  `;
+    </div>`;
+}
+
+function renderSentimentContent() {
+  const sd = SENTIMENT_DATA;
+  const linkIcon = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:0.35;flex-shrink:0;"><path d="M1 9L9 1M9 1H4M9 1V6" stroke="#3d3d8f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const barRow = (label, d, labelWidth) => `
+    <div class="sent-bar-row">
+      <span class="sent-bar-label" style="width:${labelWidth||'130px'}">${label}</span>
+      <div class="sent-bar-stacked">
+        <div class="sent-pos" style="width:${d.positive}%"></div>
+        <div class="sent-neu" style="width:${d.neutral}%"></div>
+        <div class="sent-neg" style="width:${d.negative}%"></div>
+      </div>
+      <span class="sent-count">${d.mentions}</span>
+    </div>`;
+
+  // Mechanism bars — clickable if drill-down data exists
+  const mechBars = sd.mechanisms.map(m => {
+    const hasDrilldown = sd.storiesByMechanism && sd.storiesByMechanism[m.label];
+    const isSelected = selectedMechanism === m.label;
+    const arrow = hasDrilldown
+      ? `<span class="sent-mech-arrow">${isSelected ? '▲' : '▼'}</span>`
+      : '';
+    return `
+    <div class="sent-bar-row ${hasDrilldown ? 'sent-mech-clickable' : ''} ${isSelected ? 'sent-mech-selected' : ''}"
+         ${hasDrilldown ? `onclick="setMechanism('${m.label}')"` : ''}>
+      <span class="sent-bar-label" style="width:130px;display:flex;align-items:center;gap:2px;">${m.label}${arrow}</span>
+      <div class="sent-bar-stacked">
+        <div class="sent-pos" style="width:${m.positive}%"></div>
+        <div class="sent-neu" style="width:${m.neutral}%"></div>
+        <div class="sent-neg" style="width:${m.negative}%"></div>
+      </div>
+      <span class="sent-count">${m.mentions}</span>
+    </div>`;
+  }).join('');
+
+  // Story card builder — with sentiment colour
+  const storyCard = (s, sentiment) => {
+    const colors = { positive: '#2a8a5a', neutral: '#b09020', negative: '#c04040' };
+    const bgColors = { positive: '#eaf5ef', neutral: '#faf7e6', negative: '#fdeaea' };
+    const labels = { positive: 'Positive', neutral: 'Neutral', negative: 'Negative' };
+    const col = colors[sentiment] || '#888';
+    const bg = bgColors[sentiment] || '#f5f5f5';
+    const lbl = labels[sentiment] || '';
+    return `
+    <div class="sent-story" onclick="window.open('${s.url}','_blank')" style="border-left: 3px solid ${col};">
+      <div class="sent-story-top">
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:2px 7px;border-radius:3px;background:${bg};color:${col};">${lbl}</span>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span class="sent-story-date">${s.date}</span>
+          ${linkIcon}
+        </div>
+      </div>
+      <div class="sent-story-headline">${s.headline}</div>
+      <div class="sent-story-summary">${s.summary}</div>
+      <div class="sent-story-footer">
+        <span class="sent-story-source">${s.source}</span>
+      </div>
+    </div>`;
+  };
+
+  // Default story cards (overview, all positive)
+  const overviewCards = sd.stories.map(s => `
+    <div class="sent-story" onclick="window.open('${s.url}','_blank')">
+      <div class="sent-story-top">
+        <span class="sent-story-tag">${s.tag}</span>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span class="sent-story-date">${s.date}</span>
+          ${linkIcon}
+        </div>
+      </div>
+      <div class="sent-story-headline">${s.headline}</div>
+      <div class="sent-story-summary">${s.summary}</div>
+      <div class="sent-story-footer">
+        <span class="sent-story-source">${s.source}</span>
+      </div>
+    </div>`).join('');
+
+  // Drill-down cards when a mechanism is selected
+  let drilldownHtml = '';
+  if (selectedMechanism && sd.storiesByMechanism && sd.storiesByMechanism[selectedMechanism]) {
+    const ms = sd.storiesByMechanism[selectedMechanism];
+    const total = (ms.positive||[]).length + (ms.neutral||[]).length + (ms.negative||[]).length;
+    drilldownHtml = `
+      <div style="margin: 10px 0 6px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#6a6aaa;">
+        ${selectedMechanism} · ${total} stories
+      </div>
+      ${(ms.positive||[]).map(s => storyCard(s, 'positive')).join('')}
+      ${(ms.neutral||[]).map(s => storyCard(s, 'neutral')).join('')}
+      ${(ms.negative||[]).map(s => storyCard(s, 'negative')).join('')}`;
+  }
+
+  const storySection = selectedMechanism && drilldownHtml
+    ? drilldownHtml
+    : `<div class="signals-section-label">${sd.stories.length} stories · ${sd.period}</div>${overviewCards}`;
+
+  return `
+    <div class="signals-scroll">
+      <!-- Overall -->
+      <div class="sent-heading">Overall sentiment towards resource nationalism</div>
+      <div class="sent-bar-row">
+        <span class="sent-bar-label" style="width:130px;font-weight:700;color:#3d3d8f;">${sd.overall.positive}% positive</span>
+        <div class="sent-bar-stacked">
+          <div class="sent-pos" style="width:${sd.overall.positive}%"></div>
+          <div class="sent-neu" style="width:${sd.overall.neutral}%"></div>
+          <div class="sent-neg" style="width:${sd.overall.negative}%"></div>
+        </div>
+        <span class="sent-count">${sd.totalMentions}</span>
+      </div>
+      <div class="sent-legend">
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#2a8a5a"></div>Positive</div>
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#d4c060"></div>Neutral</div>
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#c04040"></div>Negative</div>
+      </div>
+      <div class="sent-source-note">${sd.source} · ${sd.period} · media monitoring (editorial-weighted) · mentions column</div>
+
+      <hr class="sent-divider">
+
+      <!-- By mechanism — click to drill down -->
+      <div class="sent-heading">By mechanism <span style="font-size:9px;font-weight:400;color:#bbb;text-transform:none;letter-spacing:0;">· tap to see stories</span></div>
+      ${mechBars}
+
+      <hr class="sent-divider">
+
+      <!-- Key territories -->
+      <div class="sent-heading">Key territories</div>
+      ${sd.territories.map(t => barRow(t.label, t, '80px')).join('')}
+
+      <hr class="sent-divider">
+
+      <!-- Mining companies -->
+      <div class="sent-heading">Mining companies</div>
+      ${sd.companies.map(c => barRow(c.label, c, '130px')).join('')}
+
+      <hr class="sent-divider">
+
+      ${storySection}
+    </div>`;
 }
 
 // ================================================================
