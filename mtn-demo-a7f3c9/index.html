@@ -588,10 +588,11 @@ const SIGNALS = {
         title: "Research finds AML enforcement actions against mobile money rose sharply year-on-year",
         text: "Comparative study of six African jurisdictions records a marked increase in enforcement notices directed at mobile money operators, with agent networks the most common point of failure identified.",
         source: "ODI", mechanism: "Monetary sovereignty (MoMo)" },
-      { kind: "observation", date: "27 Jun 2026",
-        title: "Cameroon confirms revised telecoms levy in supplementary budget",
-        text: "Supplementary finance instrument raises the sector-specific levy on gross telecoms revenue, effective in the second half of the year.",
-        source: "Ecofin Agency", mechanism: "Fiscal clawbacks & tax" },
+      { kind: "observation", date: "17 Jun 2026",
+        title: "Nigeria rejects IMF call for a new telecoms excise duty",
+        text: "The Federal Government declines the IMF Article IV recommendation to introduce excise duties on telecommunications services, stating that Fund recommendations \u201cdo not amount to government policy and are not binding on Nigeria\u201d. The pre-2023 telecoms excise remains repealed under the new tax laws.",
+        source: "Technology Times", mechanism: "Fiscal clawbacks & tax",
+        url: "https://technologytimes.ng/nigeria-rejects-imf-call-for-new-telecoms-tax/" },
       { kind: "interpretation", date: "30 Jun 2026",
         title: "Analysts read local listing requirements as the next phase of value capture",
         text: "Commentary on recent West African policy drafts argues that mandatory local listing, rather than direct equity, is emerging as the preferred instrument for domesticating returns from foreign-owned operators.",
@@ -659,18 +660,21 @@ const SIGNALS = {
         source: "Reuters Africa", mechanism: null }
     ],
     svc: [
-      { kind: "observation", date: "1 Jul 2026",
-        title: "Ghana confirms in-country processing requirement for subscriber and transaction data",
-        text: "Final guidance sets a phased compliance deadline and requires local processing for defined categories of subscriber and mobile money transaction data. Cross-border transfer permitted only under assessed adequacy.",
-        source: "Citi Newsroom", mechanism: "Data localisation mandates" },
-      { kind: "observation", date: "7 Jul 2026",
-        title: "Central Bank of Nigeria proposes ring-fenced capital for mobile money operators",
-        text: "Consultation paper would require dedicated capital and separate governance for large mobile money businesses, with limits on intra-group liquidity movement.",
-        source: "BusinessDay Nigeria", mechanism: "Monetary sovereignty (MoMo)" },
-      { kind: "observation", date: "11 Jul 2026",
-        title: "Nigerian tax authority issues assessments to multiple telecoms operators",
-        text: "Assessments arising from the sector transfer pricing review are issued to several operators, covering multiple prior years. Operators have a defined objection window.",
-        source: "Punch Nigeria", mechanism: "Fiscal clawbacks & tax" },
+      { kind: "observation", date: "9 Jul 2026",
+        title: "Nigeria data protection industry reaches \u20a616.3bn three years after formal regulation",
+        text: "NDPC delegation to the Regional Data Governance Exchange in Nairobi sets out a \u201cCompliance First, Not Punishment\u201d posture, using Pre-Action Conferences rather than immediate sanctions. Commission signals plans for regulatory sandboxes and a data privacy innovation laboratory.",
+        source: "TechAfrica News", mechanism: "Data localisation mandates",
+        url: "https://techafricanews.com/2026/07/09/nigeria-showcases-%E2%82%A616-3-billion-data-protection-industry-at-african-governance-forum/" },
+      { kind: "interpretation", date: "16 Jul 2026",
+        title: "Ghana analysts argue mobile money now carries systemic risk requiring cross-agency oversight",
+        text: "Bank of Ghana suspended a proposed 0.75% MMFL fee on wallet-to-bank transfers days before it was due to take effect. Ghana Bankers Association Q1 2026 data puts mobile money at 31.5% of all recorded fraud cases. Commentary calls for coordination across Finance Ministry, Financial Stability Council, BoG, NCA and the Cyber Security Authority.",
+        source: "News Ghana", mechanism: "Monetary sovereignty (MoMo)",
+        url: "https://www.newsghana.com.gh/regulators-already-moving-on-momo-risks/" },
+      { kind: "finding", date: "2026 edition",
+        title: "Nigeria localisation rule: public-sector data must reside in-country absent NITDA approval",
+        text: "Standing requirement under the NDPA 2023 and the NITDA Cloud Computing Policy. Draft General Authorisation Framework and a revised Internet Industry Code of Practice are both flagged as forthcoming subsidiary legislation \u2014 the instruments through which any broader localisation duty would arrive.",
+        source: "ICLG Telecoms Nigeria 2026", mechanism: "Data localisation mandates",
+        url: "https://iclg.com/practice-areas/telecoms-media-and-internet-laws-and-regulations/nigeria/" },
       { kind: "observation", date: "15 Jul 2026",
         title: "Ghana committee recommends mandatory local listing for large licensed operators",
         text: "Committee report recommends a minimum local free float for operators above a subscriber threshold, with a three-year implementation window. Recommendation is non-binding pending cabinet consideration.",
@@ -759,15 +763,18 @@ const SENTIMENT_DATA = {
       { label: "Glo / 9mobile", positive: 41, neutral: 34, negative: 25, mentions:  29 }
     ],
     stories: [
-      { headline: "Ghana confirms in-country processing requirement for subscriber and transaction data",
-        summary: "Final guidance sets a phased compliance deadline. Domestic coverage frames the measure as overdue protection of citizen data; operator-side commentary focuses on the cost of duplicating payments and identity workloads in-country.",
-        source: "Citi Newsroom", date: "1 Jul 2026", tag: "Data localisation mandates" },
-      { headline: "Central Bank of Nigeria proposes ring-fenced capital for mobile money operators",
-        summary: "Consultation would separate governance and capital for large mobile money businesses. Framed domestically as consumer protection; sector coverage reads it as the central bank asserting control over a parallel payments rail.",
-        source: "BusinessDay Nigeria", date: "7 Jul 2026", tag: "Monetary sovereignty (MoMo)" },
-      { headline: "Nigerian tax authority issues assessments to multiple telecoms operators",
-        summary: "Multi-year assessments arising from the sector transfer pricing review. Coverage is markedly more negative towards operators than towards the authority, with framing centred on profit repatriation rather than on the technical tax question.",
-        source: "Punch Nigeria", date: "11 Jul 2026", tag: "Fiscal clawbacks & tax" },
+      { headline: "Ghana regulators already moving on mobile money systemic risk",
+        summary: "BoG suspended a proposed 0.75% MMFL wallet-to-bank fee days before it took effect. Q1 2026 fraud data puts mobile money at 31.5% of all recorded cases. Coverage is supportive of intervention and frames operators as the party to be supervised.",
+        source: "News Ghana", date: "16 Jul 2026", tag: "Monetary sovereignty (MoMo)",
+        url: "https://www.newsghana.com.gh/regulators-already-moving-on-momo-risks/" },
+      { headline: "Nigeria showcases \u20a616.3bn data protection industry at African governance forum",
+        summary: "NDPC positions Nigeria as a data governance destination with a \u201cCompliance First, Not Punishment\u201d posture. Notably constructive tone towards regulated entities \u2014 the enforcement risk here is reputational rather than punitive, for now.",
+        source: "TechAfrica News", date: "9 Jul 2026", tag: "Data localisation mandates",
+        url: "https://techafricanews.com/2026/07/09/nigeria-showcases-%E2%82%A616-3-billion-data-protection-industry-at-african-governance-forum/" },
+      { headline: "Nigeria rejects IMF call for a new telecoms excise duty",
+        summary: "Government declines the Article IV recommendation, confirming the pre-2023 telecoms excise stays repealed. A counter-signal: the fiscal pressure on operators is real, but Abuja is currently resisting the most direct instrument.",
+        source: "Technology Times", date: "17 Jun 2026", tag: "Fiscal clawbacks & tax",
+        url: "https://technologytimes.ng/nigeria-rejects-imf-call-for-new-telecoms-tax/" },
       { headline: "Ghana committee recommends mandatory local listing for large operators",
         summary: "Non-binding recommendation for a minimum local free float above a subscriber threshold. Received positively in domestic coverage as a route to domesticating returns without expropriation.",
         source: "Graphic Online", date: "15 Jul 2026", tag: "Local ownership & listing" },
@@ -781,12 +788,14 @@ const SENTIMENT_DATA = {
     storiesByMechanism: {
       "Fiscal clawbacks & tax": {
         positive: [
-          { headline: "Domestic coverage frames telecoms assessments as overdue revenue recovery",
-            summary: "Editorial and civil society commentary supports the authority's position, citing the gap between reported sector profitability and sector tax contribution.",
-            source: "Punch Nigeria", date: "12 Jul 2026" },
-          { headline: "Fiscal analysts welcome sector-specific levies as preferable to broad consumption tax",
-            summary: "Commentary argues that targeted levies on high-margin digital services are less regressive than the VAT increases otherwise under consideration.",
-            source: "Stears", date: "14 Jul 2026" }
+          { headline: "Nigeria tax reform: 5% telecoms excise abolished, sectoral levies consolidated",
+            summary: "NITDA, NASENI and Tertiary Education levies replaced by a single 4% Development Levy on assessable profits. The abolished excise was \u201cwidely criticised as regressive and counterproductive to digital inclusion\u201d. Read as administrative modernisation that cuts operator compliance load.",
+            source: "Mondaq / TMT tax analysis", date: "6 Apr 2026",
+            url: "https://www.mondaq.com/nigeria/sales-taxes-vat-gst/1769058/a-telecommunications-media-and-technology-centric-assessment-of-nigerias-tax-reform-framework" },
+          { headline: "Nigeria rejects IMF call for a new telecoms excise duty",
+            summary: "Federal Government states Fund recommendations \u201cdo not amount to government policy\u201d, citing a focus on a business-friendly environment over sector-specific taxes on voice, data and digital services.",
+            source: "Technology Times", date: "17 Jun 2026",
+            url: "https://technologytimes.ng/nigeria-rejects-imf-call-for-new-telecoms-tax/" }
         ],
         neutral: [
           { headline: "Operators given defined objection window on multi-year assessments",
@@ -797,9 +806,10 @@ const SENTIMENT_DATA = {
             source: "Ecofin Agency", date: "16 Jul 2026" }
         ],
         negative: [
-          { headline: "Investment commentary warns retrospective assessments deter capital",
-            summary: "Argument that multi-year retrospective claims raise the cost of capital for network investment at precisely the point governments are asking for accelerated rural coverage.",
-            source: "African Business", date: "15 Jul 2026" },
+          { headline: "MTN Nigeria books \u20a6583.18bn tax charge as new fiscal regime lands",
+            summary: "Tax charge for FY2025 against a \u20a6149.89bn credit in 2024 \u2014 34.38% of net profit \u2014 driven by the Nigeria Tax Act 2025's 4% Development Levy and 15% minimum effective rate. The headline number travels further than the reform context around it.",
+            source: "Billionaires Africa", date: "2 Mar 2026",
+            url: "https://www.billionaires.africa/2026/03/02/mtn-nigeria-pays-429-7-million-in-2025-taxes-as-new-fiscal-regime-lifts-corporate-levies/" },
           { headline: "Consumer groups warn levy costs will pass through to subscribers",
             summary: "Coverage anticipating tariff pass-through, positioning operators rather than the fiscal authority as the party responsible for any resulting price increase.",
             source: "MyJoyOnline", date: "17 Jul 2026" }
@@ -1280,7 +1290,7 @@ function renderSignalsContent(key, months, prevIdx) {
   return `
     ${rnHtml}
     <div class="signals-scroll">
-      <div class="signals-section-label">${signals.length} key signals · ${currentMonth}</div>
+      <div class="signals-section-label">${signals.length} key signals · ${currentMonth}${signals.some(x => x.url) ? ' · cards with ↗ open the source' : ''}</div>
       ${signalCards}
     </div>`;
 }
@@ -1457,9 +1467,9 @@ drawScoreCards();
 </script>
 
 <div class="demo-note">
-  <strong>Illustrative demo.</strong> The pipeline, scoring model and report structure are the live system. The signals,
-  scores and sentiment figures shown here are constructed to illustrate what MTN's instance would surface once its source
-  list and monitoring feed are connected. Outlets named are real; individual entries are not live intelligence.
+  <strong>Illustrative demo.</strong> The pipeline, scoring model and report structure are the live system. Cards marked ↗
+  are real, sourced and link to the original article. All other signals, all scores and all sentiment figures are constructed
+  to illustrate what MTN's instance would surface once its full source list and monitoring feed are connected.
 </div>
 
 </body>
