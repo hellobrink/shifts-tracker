@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Four Shifts Tracker — MTN (illustrative demo)</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background: #f4f4f8;
+  color: #1a1a2e;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.header {
+  background: #12122a;
+  color: white;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-wordmark {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.header-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
+.header-title { font-size: 16px; font-weight: 600; color: white; }
+.header-right { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+/* ── Layout ── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left: radar panel ── */
+.radar-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 24px 14px;
+  overflow: auto;
+  min-width: 0;
+}
+
+/* ── Month selector ── */
+.month-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.month-btn {
+  padding: 6px 18px;
+  border: 1.5px solid #d0d0e0;
+  border-radius: 20px;
+  background: white;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.month-btn:hover { border-color: #5d5dbf; color: #5d5dbf; }
+.month-btn.active {
+  background: #3d3d8f;
+  border-color: #3d3d8f;
+  color: white;
+  font-weight: 600;
+}
+.month-btn.future {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+  border-style: dashed;
+}
+
+/* ── Radar container ── */
+.radar-wrap {
+  position: relative;
+  margin: 0 auto;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: #999;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch {
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+}
+.legend-swatch.current { background: #5d5dbf; }
+.legend-swatch.prev { background: rgba(150,150,200,0.5); border-top: 2px dashed rgba(150,150,200,0.7); }
+
+/* ── Score row ── */
+.score-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.score-card {
+  background: white;
+  border: 1.5px solid #e4e4f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  min-width: 90px;
+  text-align: center;
+}
+.score-card:hover { border-color: #5d5dbf; box-shadow: 0 2px 8px rgba(93,93,191,0.12); }
+.score-card.selected { border-color: #3d3d8f; background: #f0f0f8; }
+.score-card-key { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #aaa; margin-bottom: 4px; }
+.score-card-val { font-size: 22px; font-weight: 700; color: #3d3d8f; line-height: 1; }
+.score-card-delta {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+.delta-up { color: #2a8a5a; }
+.delta-down { color: #aa3333; }
+.delta-flat { color: #999; }
+
+/* ── Tooltip ── */
+.radar-tooltip {
+  position: absolute;
+  background: #12122a;
+  color: white;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  display: none;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+/* ── Right: signals panel ── */
+.signals-panel {
+  width: 400px;
+  min-width: 360px;
+  background: white;
+  border-left: 1px solid #e0e0ec;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid #eeeef5;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+.panel-header-shift { font-size: 17px; font-weight: 700; color: #12122a; }
+.panel-header-desc { font-size: 12px; color: #888; margin-top: 3px; line-height: 1.4; }
+.panel-header-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+}
+.panel-score-big { font-size: 32px; font-weight: 800; color: #3d3d8f; line-height: 1; }
+.panel-score-delta { font-size: 14px; font-weight: 600; }
+.panel-score-max { font-size: 13px; color: #ccc; }
+
+/* ── Resource nationalism breakdown ── */
+.rn-section {
+  padding: 14px 22px;
+  border-bottom: 1px solid #eeeef5;
+  background: white;
+  flex-shrink: 0;
+}
+.rn-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bbb;
+  margin-bottom: 12px;
+}
+.rn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.rn-label { font-size: 11px; color: #555; width: 148px; flex-shrink: 0; line-height: 1.3; }
+.rn-bar-track { flex: 1; height: 5px; background: #eeeef5; border-radius: 3px; overflow: hidden; }
+.rn-bar-fill { height: 5px; background: #5d5dbf; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.rn-bar-val { font-size: 11px; font-weight: 600; color: #5d5dbf; width: 26px; text-align: right; flex-shrink: 0; }
+
+/* ── Signals list ── */
+.signals-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.signals-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bbb;
+  padding: 0 2px;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+.signal-card {
+  background: #fafafa;
+  border: 1.5px solid #ebebf5;
+  border-radius: 8px;
+  padding: 11px 13px;
+  margin-bottom: 9px;
+  transition: border-color 0.18s, background 0.18s;
+}
+.signal-card.has-link { cursor: pointer; }
+.signal-card.has-link:hover { border-color: #5d5dbf; background: #f4f4fc; }
+.signal-card.has-link:hover .signal-title { color: #3d3d8f; }
+
+.signal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.signal-kind {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.kind-observation { background: #eef2ff; color: #4a5abe; }
+.kind-finding     { background: #edf7f2; color: #2a7a50; }
+.kind-interpretation { background: #fff8ed; color: #b06818; }
+
+.signal-date { font-size: 10px; color: #bbb; }
+.signal-title { font-size: 12px; font-weight: 600; color: #12122a; margin-bottom: 5px; line-height: 1.4; }
+.signal-text { font-size: 11px; color: #666; line-height: 1.55; }
+
+.signal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 7px;
+}
+.signal-mechanism {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: #f0ebff;
+  color: #6a30a8;
+}
+.signal-source { font-size: 10px; color: #bbb; font-style: italic; }
+
+/* ── Empty state ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ccc;
+  padding: 40px;
+  text-align: center;
+}
+.empty-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.4; }
+.empty-text { font-size: 13px; color: #aaa; line-height: 1.6; }
+
+/* ── Scrollbar ── */
+.signals-scroll::-webkit-scrollbar { width: 4px; }
+.signals-scroll::-webkit-scrollbar-track { background: transparent; }
+.signals-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+/* ── Lens toggle ── */
+.lens-toggle {
+  display: flex;
+  gap: 0;
+  padding: 0 22px;
+  background: #fafafa;
+  border-bottom: 1px solid #eeeef5;
+  flex-shrink: 0;
+}
+.lens-btn {
+  padding: 8px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.lens-btn:hover { color: #5d5dbf; }
+.lens-btn.active { color: #3d3d8f; border-bottom-color: #3d3d8f; }
+
+/* ── Sentiment panel ── */
+.sent-heading {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #bbb; margin: 14px 0 8px;
+}
+.sent-divider {
+  border: none; border-top: 1px solid #eeeef5; margin: 14px 0;
+}
+.sent-bar-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+}
+.sent-bar-label {
+  font-size: 11px; color: #555; width: 130px; flex-shrink: 0; line-height: 1.3;
+}
+.sent-bar-stacked {
+  flex: 1; height: 7px; border-radius: 4px; overflow: hidden; display: flex;
+}
+.sent-pos { background: #2a8a5a; }
+.sent-neu { background: #d4c060; }
+.sent-neg { background: #c04040; }
+.sent-count { font-size: 10px; color: #bbb; width: 30px; text-align: right; flex-shrink: 0; }
+.sent-legend {
+  display: flex; gap: 12px; margin: 6px 0 2px; font-size: 10px; color: #999; flex-wrap: wrap;
+}
+.sent-legend-item { display: flex; align-items: center; gap: 4px; }
+.sent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sent-source-note { font-size: 10px; color: #ccc; margin-top: 4px; }
+.sent-mech-clickable { cursor: pointer; border-radius: 5px; padding: 3px 4px; margin: 0 -4px 4px; transition: background 0.15s; }
+.sent-mech-clickable:hover { background: #f4f4fc; }
+.sent-mech-selected { background: #ededf8 !important; }
+.sent-mech-arrow { font-size: 10px; color: #aaa; margin-left: 4px; }
+.sent-drill-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin: 12px 0 6px; display: flex; align-items: center; gap: 6px; }
+.sent-drill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Sentiment story cards */
+.sent-story {
+  background: #fafafa; border: 1.5px solid #ebebf5; border-radius: 8px;
+  padding: 11px 13px; margin-bottom: 8px; cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+}
+.sent-story:hover { border-color: #5d5dbf; background: #f4f4fc; }
+.sent-story:hover .sent-story-headline { color: #3d3d8f; }
+.sent-story-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.sent-story-tag {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 2px 7px; border-radius: 3px; background: #f0ebff; color: #6a30a8;
+}
+.sent-story-date { font-size: 10px; color: #bbb; }
+.sent-story-headline { font-size: 12px; font-weight: 600; color: #12122a; margin-bottom: 4px; line-height: 1.4; }
+.sent-story-summary { font-size: 11px; color: #666; line-height: 1.55; }
+.sent-story-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.sent-story-source { font-size: 10px; color: #bbb; font-style: italic; }
+.demo-flag { margin-left: 14px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #a8520a; background: #fdf0e0; border: 1px solid #f0d5b0;
+  padding: 3px 8px; border-radius: 3px; }
+.demo-note { flex-shrink: 0; background: #fdf0e0;
+  border-top: 1px solid #f0d5b0; color: #8a4a10; font-size: 10.5px; line-height: 1.5;
+  padding: 7px 20px; text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <span class="header-wordmark">Africa Practice</span>
+    <div class="header-divider"></div>
+    <span class="header-title">Four Shifts Tracker &nbsp;·&nbsp; MTN</span>
+    <span class="demo-flag">Illustrative demo &mdash; not live data</span>
+  </div>
+  <div class="header-right">Signal window: May – Jul 2026 &nbsp;·&nbsp; 1,486 signals</div>
+</div>
+
+<div class="main">
+
+  <!-- LEFT: radar -->
+  <div class="radar-panel">
+
+    <div class="month-selector" id="monthSelector"></div>
+
+    <div class="radar-wrap" id="radarWrap">
+      <svg id="radarSvg" width="520" height="470" viewBox="0 0 640 560"
+           style="display:block; cursor:default;"></svg>
+      <div class="radar-tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch current"></div>
+        <span>Current period</span>
+      </div>
+      <div class="legend-item" id="prevLegendItem" style="display:none;">
+        <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="rgba(150,150,200,0.6)" stroke-width="1.5" stroke-dasharray="4,3"/></svg>
+        <span id="prevLegendLabel">Previous period</span>
+      </div>
+      <span style="margin-left:8px; color:#ccc;">|</span>
+      <span>0 = legacy environment (centre)</span>
+      <span>100 = fully reshaped (edge)</span>
+    </div>
+
+    <div class="score-row" id="scoreRow"></div>
+
+  </div>
+
+  <!-- RIGHT: signals panel -->
+  <div class="signals-panel" id="signalsPanel">
+    <div class="empty-state">
+      <div class="empty-icon">◎</div>
+      <div class="empty-text">Click any shift on the radar<br>to see the signals driving it</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ================================================================
+// DATA
+// ================================================================
+
+const MONTHS = ["May 2026", "Jun 2026", "Jul 2026"];
+const FUTURE_MONTHS = [];
+
+const SCORES = {
+  "May 2026": { ias: 58, svc: 64, ct: 51, lt: 55 },
+  "Jun 2026": { ias: 65, svc: 71, ct: 58, lt: 68 },
+  "Jul 2026": { ias: 71, svc: 78, ct: 66, lt: 81 }
+};
+
+// Pressure mechanisms under Sovereignty & Value Capture
+const RN_SCORES = {
+  "May 2026": {
+    "Data localisation mandates":  56,
+    "Monetary sovereignty (MoMo)": 62,
+    "Fiscal clawbacks & tax":      68,
+    "Local ownership & listing":   49
+  },
+  "Jun 2026": {
+    "Data localisation mandates":  67,
+    "Monetary sovereignty (MoMo)": 70,
+    "Fiscal clawbacks & tax":      74,
+    "Local ownership & listing":   58
+  },
+  "Jul 2026": {
+    "Data localisation mandates":  79,
+    "Monetary sovereignty (MoMo)": 76,
+    "Fiscal clawbacks & tax":      77,
+    "Local ownership & listing":   66
+  }
+};
+
+const SHIFTS = [
+  { key: "ias", label: ["Infrastructure", "as Statecraft"],   desc: "From neutral utility to strategic national asset" },
+  { key: "svc", label: ["Sovereignty &", "Value Capture"],    desc: "From market access to negotiated terms on data, money and value" },
+  { key: "ct",  label: ["Contested", "Truth"],                desc: "From communications afterthought to perception as a strategic variable" },
+  { key: "lt",  label: ["The", "Localisation Test"],          desc: "From pan-African footprint to proving you belong in each market" }
+];
+
+// Angles: 0 = top (IAS), 90 = right (SVC), 180 = bottom (CT), 270 = left (LT)
+function shiftAngle(key) {
+  return { ias: 0, svc: 90, ct: 180, lt: 270 }[key];
+}
+
+const SIGNALS = {
+  "May 2026": {
+    ias: [
+      { kind: "observation", date: "6 May 2026",
+        title: "Nigeria classifies telecoms towers and fibre as critical national infrastructure",
+        text: "Federal designation brings MTN Nigeria's passive infrastructure under a national security framework — vandalism becomes a federal offence, but the same instrument creates a standing basis for state direction over network operations.",
+        source: "Punch Nigeria", mechanism: null },
+      { kind: "finding", date: "13 May 2026",
+        title: "Access Now records 11 African shutdown events in first half of 2026",
+        text: "The #KeepItOn coalition logs eleven state-ordered disruptions across the continent in H1, with two in MTN operating markets. Operators are named in the reporting even where the order originated with a regulator.",
+        source: "Access Now", mechanism: null },
+      { kind: "interpretation", date: "21 May 2026",
+        title: "Analysts frame African data centre buildout as a full-stack sovereignty question",
+        text: "Coverage of new hyperscale capacity in Lagos and Johannesburg increasingly asks who finances, owns and governs the compute layer rather than who supplies it — reframing operator investment as a geopolitical positioning decision.",
+        source: "Carnegie Endowment", mechanism: null }
+    ],
+    svc: [
+      { kind: "observation", date: "4 May 2026",
+        title: "Ghana Data Protection Commission consults on in-country processing rules",
+        text: "Draft guidance would require categories of subscriber and transaction data to be processed and stored within Ghana, with cross-border transfer subject to adequacy assessment. Consultation window runs to August.",
+        source: "Citi Newsroom", mechanism: "Data localisation mandates" },
+      { kind: "finding", date: "12 May 2026",
+        title: "Mobile money now exceeds 12% of GDP in three MTN markets",
+        text: "GSMA State of the Industry figures put mobile money transaction value above a tenth of GDP in Ghana, Uganda and Rwanda — the threshold at which central banks in comparable markets have historically moved to direct supervision.",
+        source: "GSMA", mechanism: "Monetary sovereignty (MoMo)" },
+      { kind: "observation", date: "19 May 2026",
+        title: "Nigerian tax authority opens review of telecoms sector transfer pricing",
+        text: "FIRS confirms a sector-wide review of intra-group management and technical service fees, covering multiple operators. Assessments of this type in the sector have historically been settled rather than litigated.",
+        source: "BusinessDay Nigeria", mechanism: "Fiscal clawbacks & tax" },
+      { kind: "interpretation", date: "27 May 2026",
+        title: "Economists link fiscal deficits to accelerating levy proposals on digital services",
+        text: "Analysis across five West African budgets identifies digital and telecoms levies as the fastest-growing revenue line item, with commentary framing large operators as the most administratively convenient collection point.",
+        source: "Stears", mechanism: "Fiscal clawbacks & tax" }
+    ],
+    ct: [
+      { kind: "finding", date: "8 May 2026",
+        title: "CIPESA documents coordinated inauthentic activity around service outages",
+        text: "Research into three West African outage events finds clustered account behaviour amplifying claims of deliberate throttling. Volume peaks precede verified service data by 12 to 30 hours.",
+        source: "CIPESA", mechanism: null },
+      { kind: "observation", date: "16 May 2026",
+        title: "SIM registration data claims circulate widely before official correction",
+        text: "Unverified claims about subscriber data access spread across WhatsApp and TikTok in two markets, reaching mainstream broadcast pickup before regulator clarification.",
+        source: "Reuters Africa", mechanism: null },
+      { kind: "interpretation", date: "26 May 2026",
+        title: "Commentators describe telecoms as the new default explanation for state failure",
+        text: "Opinion coverage across Nigerian and Ghanaian outlets notes a pattern in which network operators absorb public blame for outcomes originating in power supply, security or fiscal policy.",
+        source: "The Continent", mechanism: null }
+    ],
+    lt: [
+      { kind: "observation", date: "7 May 2026",
+        title: "Ghana parliamentary committee revisits local equity thresholds in telecoms",
+        text: "Committee hearings reopen the question of minimum Ghanaian ownership in licensed operators, referencing precedent from the mining and banking sectors.",
+        source: "MyJoyOnline", mechanism: null },
+      { kind: "finding", date: "18 May 2026",
+        title: "Survey finds country-of-origin awareness rising among Nigerian subscribers",
+        text: "Consumer research across four Nigerian states records a measurable increase in unprompted association between major operators and their headquarters country compared with the same instrument in 2024.",
+        source: "SBM Intelligence", mechanism: null },
+      { kind: "interpretation", date: "29 May 2026",
+        title: "Analysts flag South African corporate exposure to regional political cycles",
+        text: "Risk commentary identifies South African-headquartered firms operating across West Africa as carrying a distinct reputational beta tied to domestic South African events rather than local performance.",
+        source: "ISS Africa", mechanism: null }
+    ]
+  },
+
+  "Jun 2026": {
+    ias: [
+      { kind: "observation", date: "3 Jun 2026",
+        title: "Uganda regulator issues lawful interception technical standard",
+        text: "New standard specifies interface requirements for operator-side interception capability, with a compliance deadline inside twelve months. No published judicial authorisation threshold accompanies the technical rule.",
+        source: "Daily Monitor", mechanism: null },
+      { kind: "finding", date: "11 Jun 2026",
+        title: "Ranking Digital Rights notes disclosure gaps on shutdown compliance",
+        text: "Follow-up analysis to the 2026 index observes that high-scoring operators still disclose little about how they evaluate or resist government shutdown orders, identifying this as the largest remaining gap in the telecoms cohort.",
+        source: "Ranking Digital Rights", mechanism: null },
+      { kind: "observation", date: "17 Jun 2026",
+        title: "Nigeria announces sovereign cloud requirement for public sector workloads",
+        text: "Federal directive requires government data to reside on infrastructure located in Nigeria and operated under Nigerian jurisdiction, with a transition period for existing contracts.",
+        source: "TechCabal", mechanism: null },
+      { kind: "interpretation", date: "24 Jun 2026",
+        title: "Commentary positions African operators inside US-China infrastructure competition",
+        text: "Analysis of financing structures behind recent African data centre and subsea projects argues that operators are being asked, implicitly, to choose stacks rather than vendors.",
+        source: "Semafor Africa", mechanism: null }
+    ],
+    svc: [
+      { kind: "observation", date: "5 Jun 2026",
+        title: "Bank of Ghana signals intent to bring large mobile money issuers under enhanced supervision",
+        text: "Regulatory statement proposes capital, liquidity and reporting requirements for dedicated electronic money issuers above a transaction threshold, moving supervision closer to the banking regime.",
+        source: "Bank of Ghana", mechanism: "Monetary sovereignty (MoMo)" },
+      { kind: "observation", date: "13 Jun 2026",
+        title: "Nigeria Data Protection Commission opens enquiry into cross-border transfer practices",
+        text: "Enquiry covers multiple large data controllers in telecoms and financial services, focusing on the legal basis for offshore processing of subscriber records.",
+        source: "Punch Nigeria", mechanism: "Data localisation mandates" },
+      { kind: "finding", date: "20 Jun 2026",
+        title: "Research finds AML enforcement actions against mobile money rose sharply year-on-year",
+        text: "Comparative study of six African jurisdictions records a marked increase in enforcement notices directed at mobile money operators, with agent networks the most common point of failure identified.",
+        source: "ODI", mechanism: "Monetary sovereignty (MoMo)" },
+      { kind: "observation", date: "27 Jun 2026",
+        title: "Cameroon confirms revised telecoms levy in supplementary budget",
+        text: "Supplementary finance instrument raises the sector-specific levy on gross telecoms revenue, effective in the second half of the year.",
+        source: "Ecofin Agency", mechanism: "Fiscal clawbacks & tax" },
+      { kind: "interpretation", date: "30 Jun 2026",
+        title: "Analysts read local listing requirements as the next phase of value capture",
+        text: "Commentary on recent West African policy drafts argues that mandatory local listing, rather than direct equity, is emerging as the preferred instrument for domesticating returns from foreign-owned operators.",
+        source: "African Business", mechanism: "Local ownership & listing" }
+    ],
+    ct: [
+      { kind: "finding", date: "9 Jun 2026",
+        title: "Fact-checkers record synthetic audio impersonating telecoms executives",
+        text: "Verification networks in two markets document AI-generated audio clips attributed to senior industry figures circulating in closed messaging groups, primarily around tariff and data pricing claims.",
+        source: "Africa Check", mechanism: null },
+      { kind: "observation", date: "18 Jun 2026",
+        title: "Data pricing becomes a sustained political talking point in Nigeria",
+        text: "Tariff adjustment coverage moves from business pages to front-page and legislative debate, with consumer groups organising around a coordinated hashtag campaign.",
+        source: "BusinessDay Nigeria", mechanism: null },
+      { kind: "finding", date: "23 Jun 2026",
+        title: "Study finds outage narratives outlive the outages by a factor of six",
+        text: "Analysis of social conversation around network disruptions finds that narrative volume persists for a median of six times the duration of the technical incident itself.",
+        source: "Brookings", mechanism: null },
+      { kind: "interpretation", date: "29 Jun 2026",
+        title: "Practitioners argue corporate response speed is now the reputational variable",
+        text: "Industry commentary contends that in high-velocity information environments the gap between incident and first credible corporate statement predicts eventual sentiment outcome more strongly than the substance of the response.",
+        source: "Reuters Institute", mechanism: null }
+    ],
+    lt: [
+      { kind: "observation", date: "6 Jun 2026",
+        title: "Renewed xenophobic incidents in South Africa draw continental coverage",
+        text: "Violence in Gauteng and surrounding areas receives sustained coverage across West and East African outlets, with commentary explicitly linking events to South African commercial presence abroad.",
+        source: "Mail & Guardian", mechanism: null },
+      { kind: "finding", date: "15 Jun 2026",
+        title: "Sentiment analysis records anti-South African spike across West African social conversation",
+        text: "Monitoring across Nigeria and Ghana registers a sharp rise in negative conversation referencing South African brands in the ten days following the incidents, decaying more slowly than comparable 2019 events.",
+        source: "SBM Intelligence", mechanism: null },
+      { kind: "observation", date: "21 Jun 2026",
+        title: "Nigerian trade groups call for review of South African corporate presence",
+        text: "Business associations issue statements calling for reciprocity review in sectors with significant South African ownership, referencing telecoms and retail specifically.",
+        source: "Punch Nigeria", mechanism: null },
+      { kind: "interpretation", date: "28 Jun 2026",
+        title: "Commentators note localisation claims are being tested against ownership facts",
+        text: "Analysis argues that hyper-local branding is now routinely checked by publics against listed ownership and profit repatriation data, narrowing the space between local identity and local structure.",
+        source: "Rest of World", mechanism: null }
+    ]
+  },
+
+  "Jul 2026": {
+    ias: [
+      { kind: "observation", date: "2 Jul 2026",
+        title: "Ghana publishes draft critical information infrastructure directive",
+        text: "Draft brings licensed operators inside a national cyber and continuity framework, including mandatory incident reporting to the national authority within 24 hours and a state power of direction during declared emergencies.",
+        source: "Citi Newsroom", mechanism: null },
+      { kind: "finding", date: "8 Jul 2026",
+        title: "Open Secrets publishes further analysis of operator conduct during protest periods",
+        text: "Report examines decision-making by telecoms operators when receiving state instructions to restrict service during periods of civil unrest, arguing that commercial licence protection has consistently outweighed stated digital rights commitments.",
+        source: "Open Secrets", mechanism: null },
+      { kind: "observation", date: "14 Jul 2026",
+        title: "Two hyperscale data centre projects announced in MTN markets within a fortnight",
+        text: "Separate announcements in Nigeria and South Africa involve different financing origins and different governance structures, with local processing commitments attached to both.",
+        source: "TechCabal", mechanism: null },
+      { kind: "interpretation", date: "17 Jul 2026",
+        title: "Regulatory analysts argue emergency powers are outpacing due process provisions",
+        text: "Comparative review of six African telecoms frameworks finds state powers of direction over networks expanding faster than the judicial oversight mechanisms intended to constrain them.",
+        source: "Paradigm Initiative", mechanism: null },
+      { kind: "observation", date: "19 Jul 2026",
+        title: "Regional body proposes harmonised rules on network continuity during elections",
+        text: "Draft protocol would commit signatory states to maintaining connectivity through electoral periods, with a reporting obligation on operators for any restriction received.",
+        source: "Reuters Africa", mechanism: null }
+    ],
+    svc: [
+      { kind: "observation", date: "1 Jul 2026",
+        title: "Ghana confirms in-country processing requirement for subscriber and transaction data",
+        text: "Final guidance sets a phased compliance deadline and requires local processing for defined categories of subscriber and mobile money transaction data. Cross-border transfer permitted only under assessed adequacy.",
+        source: "Citi Newsroom", mechanism: "Data localisation mandates" },
+      { kind: "observation", date: "7 Jul 2026",
+        title: "Central Bank of Nigeria proposes ring-fenced capital for mobile money operators",
+        text: "Consultation paper would require dedicated capital and separate governance for large mobile money businesses, with limits on intra-group liquidity movement.",
+        source: "BusinessDay Nigeria", mechanism: "Monetary sovereignty (MoMo)" },
+      { kind: "observation", date: "11 Jul 2026",
+        title: "Nigerian tax authority issues assessments to multiple telecoms operators",
+        text: "Assessments arising from the sector transfer pricing review are issued to several operators, covering multiple prior years. Operators have a defined objection window.",
+        source: "Punch Nigeria", mechanism: "Fiscal clawbacks & tax" },
+      { kind: "observation", date: "15 Jul 2026",
+        title: "Ghana committee recommends mandatory local listing for large licensed operators",
+        text: "Committee report recommends a minimum local free float for operators above a subscriber threshold, with a three-year implementation window. Recommendation is non-binding pending cabinet consideration.",
+        source: "Graphic Online", mechanism: "Local ownership & listing" },
+      { kind: "finding", date: "18 Jul 2026",
+        title: "Comparative study finds data localisation costs concentrate in fintech, not connectivity",
+        text: "Analysis of localisation implementation in four emerging markets finds the compliance burden falls disproportionately on payments and identity workloads rather than core network operations.",
+        source: "ODI", mechanism: "Data localisation mandates" },
+      { kind: "interpretation", date: "19 Jul 2026",
+        title: "Analysts describe convergence of data, monetary and fiscal sovereignty into a single negotiation",
+        text: "Commentary argues that localisation, mobile money supervision and tax claims are increasingly presented to operators as one bundled sovereignty conversation rather than as separate regulatory tracks.",
+        source: "Carnegie Endowment", mechanism: null }
+    ],
+    ct: [
+      { kind: "finding", date: "4 Jul 2026",
+        title: "Coordinated campaign links telecoms operator to xenophobic incidents",
+        text: "Monitoring identifies a clustered campaign across two platforms connecting a named operator to South African domestic violence, using recycled imagery and synthetic claims. Campaign shows organic pickup beyond the originating cluster.",
+        source: "CIPESA", mechanism: null },
+      { kind: "observation", date: "10 Jul 2026",
+        title: "Deepfake video of a purported service announcement circulates in two markets",
+        text: "AI-generated video claiming imminent tariff changes circulates widely before correction, with pickup by at least one mainstream broadcaster prior to verification.",
+        source: "Africa Check", mechanism: null },
+      { kind: "finding", date: "16 Jul 2026",
+        title: "Research finds trust in operator communications lags trust in the network itself",
+        text: "Multi-market survey records a persistent gap between confidence in network reliability and confidence in operator public statements, widest among respondents under 30.",
+        source: "Afrobarometer", mechanism: null },
+      { kind: "interpretation", date: "18 Jul 2026",
+        title: "Analysts argue B2P engagement is now a risk control, not a marketing function",
+        text: "Commentary contends that direct engagement with digitally native publics has moved from brand activity to a material factor in regulatory and political outcomes, given how quickly public narrative now precedes formal process.",
+        source: "Rest of World", mechanism: null }
+    ],
+    lt: [
+      { kind: "observation", date: "3 Jul 2026",
+        title: "Protest action targets South African-owned businesses in two Nigerian cities",
+        text: "Demonstrations outside commercial premises in Lagos and Abuja reference South African domestic events. Telecoms retail outlets are named in organiser materials.",
+        source: "Punch Nigeria", mechanism: null },
+      { kind: "finding", date: "9 Jul 2026",
+        title: "Negative conversation referencing South African brands sustains above baseline for six weeks",
+        text: "Monitoring finds elevated negative volume persisting well beyond the decay curve observed in 2019, suggesting a shift from event-driven spike to sustained background sentiment.",
+        source: "SBM Intelligence", mechanism: null },
+      { kind: "observation", date: "13 Jul 2026",
+        title: "Ghanaian ministers restate expectations on local employment and procurement in telecoms",
+        text: "Public remarks tie continued regulatory goodwill to demonstrable local hiring, local supplier spend and local senior leadership across licensed operators.",
+        source: "MyJoyOnline", mechanism: null },
+      { kind: "finding", date: "17 Jul 2026",
+        title: "Afrobarometer records rising support for restrictions on foreign-owned firms",
+        text: "Latest round finds increased support in West African markets for policies limiting foreign ownership in strategic sectors, with telecoms named among the sectors most frequently cited.",
+        source: "Afrobarometer", mechanism: null },
+      { kind: "interpretation", date: "19 Jul 2026",
+        title: "Risk analysts describe country-of-origin as an unhedged exposure",
+        text: "Commentary argues that South African-headquartered operators carry a political exposure generated entirely outside their own operations and outside their control, which local performance cannot offset.",
+        source: "ISS Africa", mechanism: null }
+    ]
+  }
+};
+
+// Sentiment layer, keyed by shift. Illustrative figures showing the structure
+// a media monitoring feed would populate.
+const SENTIMENT_DATA = {
+  svc: {
+    period: "Jun 20 – Jul 19, 2026",
+    source: "Media monitoring layer (illustrative)",
+    overallLabel: "Overall sentiment towards sovereignty and value capture measures",
+    totalMentions: 412,
+    overall: { positive: 51, neutral: 27, negative: 22 },
+    mechanismHeading: "By mechanism",
+    mechanisms: [
+      { label: "Data localisation mandates",  positive: 64, neutral: 22, negative: 14, mentions: 118 },
+      { label: "Monetary sovereignty (MoMo)", positive: 47, neutral: 30, negative: 23, mentions: 104 },
+      { label: "Fiscal clawbacks & tax",      positive: 39, neutral: 24, negative: 37, mentions: 131 },
+      { label: "Local ownership & listing",   positive: 58, neutral: 27, negative: 15, mentions:  59 }
+    ],
+    territories: [
+      { label: "Nigeria",      positive: 44, neutral: 26, negative: 30, mentions: 147 },
+      { label: "Ghana",        positive: 61, neutral: 25, negative: 14, mentions: 112 },
+      { label: "South Africa", positive: 48, neutral: 32, negative: 20, mentions:  71 },
+      { label: "Uganda",       positive: 55, neutral: 30, negative: 15, mentions:  46 },
+      { label: "Cameroon",     positive: 40, neutral: 33, negative: 27, mentions:  36 }
+    ],
+    peersHeading: "Operator share of voice",
+    peers: [
+      { label: "MTN",           positive: 46, neutral: 29, negative: 25, mentions: 186 },
+      { label: "Airtel Africa", positive: 52, neutral: 31, negative: 17, mentions:  94 },
+      { label: "Vodacom",       positive: 49, neutral: 33, negative: 18, mentions:  62 },
+      { label: "Orange",        positive: 57, neutral: 28, negative: 15, mentions:  41 },
+      { label: "Glo / 9mobile", positive: 41, neutral: 34, negative: 25, mentions:  29 }
+    ],
+    stories: [
+      { headline: "Ghana confirms in-country processing requirement for subscriber and transaction data",
+        summary: "Final guidance sets a phased compliance deadline. Domestic coverage frames the measure as overdue protection of citizen data; operator-side commentary focuses on the cost of duplicating payments and identity workloads in-country.",
+        source: "Citi Newsroom", date: "1 Jul 2026", tag: "Data localisation mandates" },
+      { headline: "Central Bank of Nigeria proposes ring-fenced capital for mobile money operators",
+        summary: "Consultation would separate governance and capital for large mobile money businesses. Framed domestically as consumer protection; sector coverage reads it as the central bank asserting control over a parallel payments rail.",
+        source: "BusinessDay Nigeria", date: "7 Jul 2026", tag: "Monetary sovereignty (MoMo)" },
+      { headline: "Nigerian tax authority issues assessments to multiple telecoms operators",
+        summary: "Multi-year assessments arising from the sector transfer pricing review. Coverage is markedly more negative towards operators than towards the authority, with framing centred on profit repatriation rather than on the technical tax question.",
+        source: "Punch Nigeria", date: "11 Jul 2026", tag: "Fiscal clawbacks & tax" },
+      { headline: "Ghana committee recommends mandatory local listing for large operators",
+        summary: "Non-binding recommendation for a minimum local free float above a subscriber threshold. Received positively in domestic coverage as a route to domesticating returns without expropriation.",
+        source: "Graphic Online", date: "15 Jul 2026", tag: "Local ownership & listing" },
+      { headline: "Cameroon confirms revised telecoms levy in supplementary budget",
+        summary: "Sector-specific levy on gross revenue raised for the second half of the year. Limited domestic debate; regional coverage places it in a pattern of deficit-driven sector levies across francophone markets.",
+        source: "Ecofin Agency", date: "27 Jun 2026", tag: "Fiscal clawbacks & tax" },
+      { headline: "Analysts describe data, monetary and fiscal sovereignty converging into one negotiation",
+        summary: "Argument that operators are increasingly presented with a bundled sovereignty conversation rather than separate regulatory tracks — with implications for who inside a company owns the relationship.",
+        source: "Carnegie Endowment", date: "19 Jul 2026", tag: "Data localisation mandates" }
+    ],
+    storiesByMechanism: {
+      "Fiscal clawbacks & tax": {
+        positive: [
+          { headline: "Domestic coverage frames telecoms assessments as overdue revenue recovery",
+            summary: "Editorial and civil society commentary supports the authority's position, citing the gap between reported sector profitability and sector tax contribution.",
+            source: "Punch Nigeria", date: "12 Jul 2026" },
+          { headline: "Fiscal analysts welcome sector-specific levies as preferable to broad consumption tax",
+            summary: "Commentary argues that targeted levies on high-margin digital services are less regressive than the VAT increases otherwise under consideration.",
+            source: "Stears", date: "14 Jul 2026" }
+        ],
+        neutral: [
+          { headline: "Operators given defined objection window on multi-year assessments",
+            summary: "Procedural coverage of the objection and appeal timetable. Notes that assessments of this type in the sector have historically been settled rather than litigated to conclusion.",
+            source: "BusinessDay Nigeria", date: "13 Jul 2026" },
+          { headline: "Regional comparison of telecoms levy rates published",
+            summary: "Comparative analysis across eight African markets showing sector levy rates and their trajectory. Presented without editorial position.",
+            source: "Ecofin Agency", date: "16 Jul 2026" }
+        ],
+        negative: [
+          { headline: "Investment commentary warns retrospective assessments deter capital",
+            summary: "Argument that multi-year retrospective claims raise the cost of capital for network investment at precisely the point governments are asking for accelerated rural coverage.",
+            source: "African Business", date: "15 Jul 2026" },
+          { headline: "Consumer groups warn levy costs will pass through to subscribers",
+            summary: "Coverage anticipating tariff pass-through, positioning operators rather than the fiscal authority as the party responsible for any resulting price increase.",
+            source: "MyJoyOnline", date: "17 Jul 2026" }
+        ]
+      }
+    }
+  },
+
+  lt: {
+    period: "Jun 20 – Jul 19, 2026",
+    source: "Media monitoring layer (illustrative)",
+    overallLabel: "Overall sentiment towards South African corporate presence",
+    totalMentions: 587,
+    overall: { positive: 24, neutral: 29, negative: 47 },
+    mechanismHeading: "By driver",
+    mechanisms: [
+      { label: "Xenophobia spillover",     positive: 11, neutral: 21, negative: 68, mentions: 214 },
+      { label: "Country-of-origin framing", positive: 19, neutral: 30, negative: 51, mentions: 163 },
+      { label: "Local ownership demands",  positive: 34, neutral: 36, negative: 30, mentions:  118 },
+      { label: "Jobs & local procurement", positive: 48, neutral: 32, negative: 20, mentions:   92 }
+    ],
+    territories: [
+      { label: "Nigeria",      positive: 15, neutral: 24, negative: 61, mentions: 241 },
+      { label: "Ghana",        positive: 28, neutral: 31, negative: 41, mentions: 138 },
+      { label: "South Africa", positive: 39, neutral: 34, negative: 27, mentions: 106 },
+      { label: "Uganda",       positive: 35, neutral: 38, negative: 27, mentions:  58 },
+      { label: "Cameroon",     positive: 30, neutral: 36, negative: 34, mentions:  44 }
+    ],
+    peersHeading: "Operator share of voice",
+    peers: [
+      { label: "MTN",           positive: 19, neutral: 26, negative: 55, mentions: 302 },
+      { label: "Vodacom",       positive: 27, neutral: 31, negative: 42, mentions:  88 },
+      { label: "Airtel Africa", positive: 54, neutral: 32, negative: 14, mentions:  97 },
+      { label: "Orange",        positive: 58, neutral: 30, negative: 12, mentions:  61 },
+      { label: "Glo / 9mobile", positive: 49, neutral: 33, negative: 18, mentions:  39 }
+    ],
+    stories: [
+      { headline: "Protest action targets South African-owned businesses in two Nigerian cities",
+        summary: "Demonstrations in Lagos and Abuja reference South African domestic events. Telecoms retail outlets named in organiser materials. Coverage makes no distinction between locally incorporated subsidiaries and the parent group.",
+        source: "Punch Nigeria", date: "3 Jul 2026", tag: "Xenophobia spillover" },
+      { headline: "Negative conversation sustains above baseline for six weeks",
+        summary: "Elevated negative volume persisting well beyond the 2019 decay curve. The shift from event-driven spike to sustained background sentiment is the material change, not the peak height.",
+        source: "SBM Intelligence", date: "9 Jul 2026", tag: "Country-of-origin framing" },
+      { headline: "Ghanaian ministers restate expectations on local employment and procurement",
+        summary: "Public remarks tie continued regulatory goodwill to demonstrable local hiring, local supplier spend and local senior leadership. Coverage is comparatively constructive and offers a defined route to credit.",
+        source: "MyJoyOnline", date: "13 Jul 2026", tag: "Jobs & local procurement" },
+      { headline: "Afrobarometer records rising support for restrictions on foreign-owned firms",
+        summary: "Increased West African support for limiting foreign ownership in strategic sectors, with telecoms among the sectors most frequently named. Trend is steady rather than event-driven.",
+        source: "Afrobarometer", date: "17 Jul 2026", tag: "Local ownership demands" },
+      { headline: "Coordinated campaign links telecoms operator to xenophobic incidents",
+        summary: "Clustered campaign across two platforms using recycled imagery and synthetic claims, showing organic pickup beyond the originating cluster. The organic spread is the part that does not decay on its own.",
+        source: "CIPESA", date: "4 Jul 2026", tag: "Xenophobia spillover" },
+      { headline: "Risk analysts describe country-of-origin as an unhedged exposure",
+        summary: "Argument that South African-headquartered operators carry political exposure generated entirely outside their own operations, which local commercial performance cannot offset.",
+        source: "ISS Africa", date: "19 Jul 2026", tag: "Country-of-origin framing" }
+    ],
+    storiesByMechanism: {
+      "Xenophobia spillover": {
+        positive: [
+          { headline: "Local staff and community programmes cited in defence of operator presence",
+            summary: "Counter-coverage highlighting local employment figures and community investment, largely originating from business press rather than general news.",
+            source: "BusinessDay Nigeria", date: "8 Jul 2026" }
+        ],
+        neutral: [
+          { headline: "Analysis separates parent group from locally incorporated subsidiaries",
+            summary: "Explanatory coverage distinguishing corporate structure, local shareholding and local tax contribution. Limited reach relative to the material it corrects.",
+            source: "Stears", date: "10 Jul 2026" },
+          { headline: "Regional comparison of 2019 and 2026 backlash episodes",
+            summary: "Comparative piece noting a similar peak but a materially slower decay in 2026, attributed to sustained amplification rather than to a larger initiating event.",
+            source: "The Continent", date: "12 Jul 2026" }
+        ],
+        negative: [
+          { headline: "Trade groups call for review of South African corporate presence",
+            summary: "Business associations issue reciprocity review statements naming telecoms and retail specifically. Coverage carries a policy framing rather than a protest framing, which extends its shelf life.",
+            source: "Punch Nigeria", date: "21 Jun 2026" },
+          { headline: "Recycled imagery from prior incidents drives renewed circulation",
+            summary: "Verification networks identify 2019 and 2023 footage recirculating as current, with operator branding visible in several of the most-shared items.",
+            source: "Africa Check", date: "6 Jul 2026" },
+          { headline: "Commentary questions whether hyper-local branding survives contact with ownership facts",
+            summary: "Argument that publics now routinely check local identity claims against listed ownership and profit repatriation data, narrowing the space between local presence and local structure.",
+            source: "Rest of World", date: "28 Jun 2026" }
+        ]
+      }
+    }
+  }
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let currentMonth = "Jul 2026";
+let selectedShift = null;
+let panelView = 'signals';
+let selectedMechanism = null;
+
+// ================================================================
+// RADAR GEOMETRY
+// ================================================================
+const CX = 320, CY = 285, R = 150;
+const LEVELS = [25, 50, 75, 100];
+
+function axisXY(key, r) {
+  const a = shiftAngle(key) * Math.PI / 180;
+  return { x: CX + r * Math.sin(a), y: CY - r * Math.cos(a) };
+}
+
+function ns(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+
+// ================================================================
+// DRAW RADAR
+// ================================================================
+function drawRadar() {
+  const svg = document.getElementById('radarSvg');
+  svg.innerHTML = '';
+
+  const data = SCORES[currentMonth];
+  if (!data || data.ias === null) {
+    const t = ns('text');
+    t.setAttribute('x', CX); t.setAttribute('y', CY);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '14');
+    t.setAttribute('fill', '#bbb');
+    t.textContent = 'Data not yet available';
+    svg.appendChild(t);
+    return;
+  }
+
+  // ── Grid polygons ──
+  for (const level of LEVELS) {
+    const pts = SHIFTS.map(s => {
+      const p = axisXY(s.key, R * level / 100);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    const poly = ns('polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', 'none');
+    poly.setAttribute('stroke', level === 100 ? '#c8c8dc' : '#dddde8');
+    poly.setAttribute('stroke-width', level === 100 ? '1' : '1');
+    svg.appendChild(poly);
+  }
+
+  // ── Axis lines ──
+  for (const shift of SHIFTS) {
+    const end = axisXY(shift.key, R);
+    const line = ns('line');
+    line.setAttribute('x1', CX); line.setAttribute('y1', CY);
+    line.setAttribute('x2', end.x); line.setAttribute('y2', end.y);
+    line.setAttribute('stroke', '#d0d0e0');
+    line.setAttribute('stroke-width', '1');
+    svg.appendChild(line);
+  }
+
+  // ── Level labels ──
+  for (const level of [25, 50, 75]) {
+    const p = axisXY('vs', R * level / 100);
+    const t = ns('text');
+    t.setAttribute('x', p.x + 4);
+    t.setAttribute('y', p.y + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '9');
+    t.setAttribute('fill', '#c0c0cc');
+    t.textContent = level;
+    svg.appendChild(t);
+  }
+
+  // ── Previous month ghost ──
+  const months = MONTHS.filter(m => !FUTURE_MONTHS.includes(m));
+  const prevIdx = months.indexOf(currentMonth) - 1;
+  const prevLegend = document.getElementById('prevLegendItem');
+  const prevLegendLabel = document.getElementById('prevLegendLabel');
+
+  if (prevIdx >= 0) {
+    const prevMonth = months[prevIdx];
+    const prevData = SCORES[prevMonth];
+    const prevPts = SHIFTS.map(s => {
+      const p = axisXY(s.key, R * prevData[s.key] / 100);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    const prevPoly = ns('polygon');
+    prevPoly.setAttribute('points', prevPts);
+    prevPoly.setAttribute('fill', 'rgba(100,100,190,0.05)');
+    prevPoly.setAttribute('stroke', 'rgba(130,130,200,0.45)');
+    prevPoly.setAttribute('stroke-width', '1.5');
+    prevPoly.setAttribute('stroke-dasharray', '5,3');
+    svg.appendChild(prevPoly);
+    if (prevLegend) { prevLegend.style.display = 'flex'; prevLegendLabel.textContent = prevMonth; }
+  } else {
+    if (prevLegend) prevLegend.style.display = 'none';
+  }
+
+  // ── Main data polygon ──
+  const pts = SHIFTS.map(s => {
+    const p = axisXY(s.key, R * data[s.key] / 100);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+  const poly = ns('polygon');
+  poly.setAttribute('points', pts);
+  poly.setAttribute('fill', 'rgba(93,93,191,0.13)');
+  poly.setAttribute('stroke', '#5d5dbf');
+  poly.setAttribute('stroke-width', '2');
+  svg.appendChild(poly);
+
+  // ── Data nodes ──
+  for (const shift of SHIFTS) {
+    const p = axisXY(shift.key, R * data[shift.key] / 100);
+    const sel = selectedShift === shift.key;
+
+    // Hit area
+    const hitR = 22;
+    const hit = ns('circle');
+    hit.setAttribute('cx', p.x); hit.setAttribute('cy', p.y);
+    hit.setAttribute('r', hitR);
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('cursor', 'pointer');
+    hit.addEventListener('click', () => selectShift(shift.key));
+    hit.addEventListener('mouseenter', e => showTip(e, shift.key, data[shift.key]));
+    hit.addEventListener('mouseleave', hideTip);
+    svg.appendChild(hit);
+
+    // Outer ring when selected
+    if (sel) {
+      const ring = ns('circle');
+      ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y);
+      ring.setAttribute('r', '12');
+      ring.setAttribute('fill', 'rgba(61,61,143,0.12)');
+      ring.setAttribute('stroke', '#3d3d8f');
+      ring.setAttribute('stroke-width', '1.5');
+      svg.appendChild(ring);
+    }
+
+    const circ = ns('circle');
+    circ.setAttribute('cx', p.x); circ.setAttribute('cy', p.y);
+    circ.setAttribute('r', sel ? '7' : '6');
+    circ.setAttribute('fill', sel ? '#3d3d8f' : '#5d5dbf');
+    circ.setAttribute('stroke', 'white');
+    circ.setAttribute('stroke-width', '2.5');
+    circ.setAttribute('cursor', 'pointer');
+    circ.addEventListener('click', () => selectShift(shift.key));
+    circ.addEventListener('mouseenter', e => showTip(e, shift.key, data[shift.key]));
+    circ.addEventListener('mouseleave', hideTip);
+    svg.appendChild(circ);
+  }
+
+  // ── Axis labels ──
+  const labelConfig = {
+    ias: { offsetX: 0,   offsetY: -28, anchor: 'middle', side: 0  },
+    svc: { offsetX: 28,  offsetY: 0,   anchor: 'middle', side: 1  },
+    ct:  { offsetX: 0,   offsetY: 28,  anchor: 'middle', side: 0  },
+    lt:  { offsetX: -28, offsetY: 0,   anchor: 'middle', side: -1 }
+  };
+
+  for (const shift of SHIFTS) {
+    const edgePt = axisXY(shift.key, R);
+    const cfg = labelConfig[shift.key];
+    const lx = edgePt.x + cfg.offsetX;
+    const ly = edgePt.y + cfg.offsetY;
+    const sel = selectedShift === shift.key;
+
+    const g = ns('g');
+    g.setAttribute('cursor', 'pointer');
+    g.addEventListener('click', () => selectShift(shift.key));
+
+    const lineCount = shift.label.length;
+    const lineH = 16;
+    const totalH = lineCount * lineH;
+    // Vertical centering: for top/bottom labels, offset from baseline
+    let startDy = 0;
+    if (shift.key === 'ias') startDy = -(totalH - lineH);
+    if (shift.key === 'ct')  startDy = 0;
+    if (shift.key === 'svc' || shift.key === 'lt') startDy = -(totalH / 2) + (lineH / 2) - 2;
+
+    const t = ns('text');
+    t.setAttribute('x', lx);
+    t.setAttribute('y', ly + startDy);
+    t.setAttribute('text-anchor', cfg.anchor);
+    t.setAttribute('font-size', '13');
+    t.setAttribute('font-weight', '600');
+    t.setAttribute('fill', sel ? '#3d3d8f' : '#2a2a4a');
+    t.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+
+    for (let i = 0; i < shift.label.length; i++) {
+      const ts = ns('tspan');
+      ts.setAttribute('x', lx);
+      ts.setAttribute('dy', i === 0 ? 0 : lineH);
+      ts.textContent = shift.label[i];
+      t.appendChild(ts);
+    }
+    g.appendChild(t);
+    svg.appendChild(g);
+
+    // Left/right labels: shift the block clear of the radar by half its own
+    // width, so its lines stay centred on each other rather than edge-aligned.
+    if (cfg.side !== 0) {
+      const w = t.getBBox().width;
+      const finalX = edgePt.x + cfg.side * (28 + w / 2);
+      t.setAttribute('x', finalX);
+      for (const ts of t.childNodes) ts.setAttribute('x', finalX);
+    }
+  }
+}
+
+// ================================================================
+// TOOLTIP
+// ================================================================
+function showTip(e, key, score) {
+  const names = { ias: 'Infrastructure as Statecraft', svc: 'Sovereignty & Value Capture', ct: 'Contested Truth', lt: 'The Localisation Test' };
+  const tip = document.getElementById('tooltip');
+  tip.textContent = `${names[key]}: ${score}/100`;
+  tip.style.display = 'block';
+  const rect = document.getElementById('radarWrap').getBoundingClientRect();
+  const svgRect = document.getElementById('radarSvg').getBoundingClientRect();
+  tip.style.left = (e.clientX - svgRect.left + 12) + 'px';
+  tip.style.top = (e.clientY - svgRect.top - 10) + 'px';
+}
+function hideTip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+// ================================================================
+// SCORE CARDS
+// ================================================================
+function drawScoreCards() {
+  const row = document.getElementById('scoreRow');
+  const data = SCORES[currentMonth];
+  if (!data || data.ias === null) { row.innerHTML = ''; return; }
+
+  const months = MONTHS.filter(m => !FUTURE_MONTHS.includes(m));
+  const prevIdx = months.indexOf(currentMonth) - 1;
+  const prevData = prevIdx >= 0 ? SCORES[months[prevIdx]] : null;
+
+  const labels = { ias: 'IaS', svc: 'S&VC', ct: 'CT', lt: 'LT' };
+
+  row.innerHTML = '';
+  for (const shift of SHIFTS) {
+    const k = shift.key;
+    const score = data[k];
+    const prev = prevData ? prevData[k] : null;
+    const diff = prev !== null ? score - prev : null;
+
+    const card = document.createElement('div');
+    card.className = 'score-card' + (selectedShift === k ? ' selected' : '');
+    card.onclick = () => selectShift(k);
+
+    let deltaHtml = '';
+    if (diff !== null) {
+      const cls = diff > 0 ? 'delta-up' : (diff < 0 ? 'delta-down' : 'delta-flat');
+      const sign = diff > 0 ? '+' : '';
+      deltaHtml = `<div class="score-card-delta ${cls}">${sign}${diff} vs ${months[prevIdx]}</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="score-card-key">${labels[k]}</div>
+      <div class="score-card-val">${score}</div>
+      ${deltaHtml}
+    `;
+    row.appendChild(card);
+  }
+}
+
+// ================================================================
+// SIGNALS PANEL
+// ================================================================
+function selectShift(key) {
+  selectedShift = key;
+  panelView = 'signals';
+  selectedMechanism = null;
+  drawRadar();
+  drawScoreCards();
+  renderPanel(key);
+}
+
+function setView(view) {
+  panelView = view;
+  selectedMechanism = null;
+  renderPanel(selectedShift);
+}
+
+function setMechanism(name) {
+  selectedMechanism = (selectedMechanism === name) ? null : name;
+  renderPanel(selectedShift);
+}
+
+function renderPanel(key) {
+  const panel = document.getElementById('signalsPanel');
+  const data = SCORES[currentMonth];
+  const score = data ? data[key] : null;
+  const shifts_meta = SHIFTS.find(s => s.key === key);
+
+  const months = MONTHS.filter(m => !FUTURE_MONTHS.includes(m));
+  const prevIdx = months.indexOf(currentMonth) - 1;
+  const prevScore = (score !== null && prevIdx >= 0) ? SCORES[months[prevIdx]][key] : null;
+  const diff = (score !== null && prevScore !== null) ? score - prevScore : null;
+  const diffHtml = diff !== null
+    ? `<span class="panel-score-delta ${diff >= 0 ? 'delta-up' : 'delta-down'}">${diff >= 0 ? '+' : ''}${diff} vs ${months[prevIdx]}</span>`
+    : '';
+
+  const shiftDisplayName = shifts_meta.label.join(' ');
+  const scoreHtml = score !== null
+    ? `<div class="panel-header-score-row">
+        <span class="panel-score-big">${score}</span>
+        ${diffHtml}
+        <span class="panel-score-max">/ 100</span>
+       </div>`
+    : `<div style="font-size:12px;color:#aaa;margin-top:8px;">Data pending — June report running Monday</div>`;
+
+  // Lens toggle — shown for shifts that have a sentiment dataset attached
+  const hasSentiment = !!SENTIMENT_DATA[key];
+  const lensHtml = hasSentiment ? `
+    <div class="lens-toggle">
+      <button class="lens-btn ${panelView === 'signals' ? 'active' : ''}" onclick="setView('signals')">Signals</button>
+      <button class="lens-btn ${panelView === 'sentiment' ? 'active' : ''}" onclick="setView('sentiment')">Sentiment Barometer</button>
+    </div>` : '';
+
+  const contentHtml = (panelView === 'sentiment' && hasSentiment)
+    ? renderSentimentContent(key)
+    : renderSignalsContent(key, months, prevIdx);
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-header-shift">${shiftDisplayName}</div>
+      <div class="panel-header-desc">${shifts_meta.desc}</div>
+      ${scoreHtml}
+    </div>
+    ${lensHtml}
+    ${contentHtml}
+  `;
+}
+
+function renderSignalsContent(key, months, prevIdx) {
+  // Pressure mechanism bars — Sovereignty & Value Capture only
+  let rnHtml = '';
+  if (key === 'svc') {
+    const rn = RN_SCORES[currentMonth];
+    const prevRn = prevIdx >= 0 ? RN_SCORES[months[prevIdx]] : null;
+    if (rn) {
+      const rows = Object.entries(rn).map(([label, val]) => {
+        const prevVal = prevRn ? prevRn[label] : null;
+        const d = prevVal !== null ? val - prevVal : null;
+        const dHtml = d !== null
+          ? `<span style="font-size:9px;font-weight:600;color:${d>0?'#2a7a50':'#aa3333'};margin-left:3px;">${d>0?'+':''}${d}</span>`
+          : '';
+        return `
+          <div class="rn-row">
+            <span class="rn-label">${label}</span>
+            <div class="rn-bar-track"><div class="rn-bar-fill" style="width:${val}%"></div></div>
+            <span class="rn-bar-val">${val}${dHtml}</span>
+          </div>`;
+      }).join('');
+      rnHtml = `
+        <div class="rn-section">
+          <div class="rn-section-title">Pressure mechanisms</div>
+          ${rows}
+        </div>`;
+    }
+  }
+
+  const signals = (SIGNALS[currentMonth] || {})[key] || [];
+  const signalCards = signals.map(s => `
+    <div class="signal-card${s.url ? ' has-link' : ''}"
+         ${s.url ? `onclick="window.open('${s.url}','_blank')"` : ''}>
+      <div class="signal-top">
+        <span class="signal-kind kind-${s.kind}">${s.kind}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="signal-date">${s.date}</span>
+          ${s.url ? `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:0.35;flex-shrink:0;"><path d="M1 9L9 1M9 1H4M9 1V6" stroke="#3d3d8f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+        </div>
+      </div>
+      <div class="signal-title">${s.title}</div>
+      <div class="signal-text">${s.text}</div>
+      <div class="signal-footer">
+        ${s.mechanism ? `<span class="signal-mechanism">${s.mechanism}</span>` : '<span></span>'}
+        <span class="signal-source">${s.source}</span>
+      </div>
+    </div>`).join('');
+
+  return `
+    ${rnHtml}
+    <div class="signals-scroll">
+      <div class="signals-section-label">${signals.length} key signals · ${currentMonth}</div>
+      ${signalCards}
+    </div>`;
+}
+
+function renderSentimentContent(key) {
+  const sd = SENTIMENT_DATA[key];
+  const linkIcon = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:0.35;flex-shrink:0;"><path d="M1 9L9 1M9 1H4M9 1V6" stroke="#3d3d8f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const barRow = (label, d, labelWidth) => `
+    <div class="sent-bar-row">
+      <span class="sent-bar-label" style="width:${labelWidth||'130px'}">${label}</span>
+      <div class="sent-bar-stacked">
+        <div class="sent-pos" style="width:${d.positive}%"></div>
+        <div class="sent-neu" style="width:${d.neutral}%"></div>
+        <div class="sent-neg" style="width:${d.negative}%"></div>
+      </div>
+      <span class="sent-count">${d.mentions}</span>
+    </div>`;
+
+  // Mechanism bars — clickable if drill-down data exists
+  const mechBars = sd.mechanisms.map(m => {
+    const hasDrilldown = sd.storiesByMechanism && sd.storiesByMechanism[m.label];
+    const isSelected = selectedMechanism === m.label;
+    const arrow = hasDrilldown
+      ? `<span class="sent-mech-arrow">${isSelected ? '▲' : '▼'}</span>`
+      : '';
+    return `
+    <div class="sent-bar-row ${hasDrilldown ? 'sent-mech-clickable' : ''} ${isSelected ? 'sent-mech-selected' : ''}"
+         ${hasDrilldown ? `onclick="setMechanism('${m.label}')"` : ''}>
+      <span class="sent-bar-label" style="width:130px;display:flex;align-items:center;gap:2px;">${m.label}${arrow}</span>
+      <div class="sent-bar-stacked">
+        <div class="sent-pos" style="width:${m.positive}%"></div>
+        <div class="sent-neu" style="width:${m.neutral}%"></div>
+        <div class="sent-neg" style="width:${m.negative}%"></div>
+      </div>
+      <span class="sent-count">${m.mentions}</span>
+    </div>`;
+  }).join('');
+
+  // Story card builder — with sentiment colour
+  const storyCard = (s, sentiment) => {
+    const colors = { positive: '#2a8a5a', neutral: '#b09020', negative: '#c04040' };
+    const bgColors = { positive: '#eaf5ef', neutral: '#faf7e6', negative: '#fdeaea' };
+    const labels = { positive: 'Positive', neutral: 'Neutral', negative: 'Negative' };
+    const col = colors[sentiment] || '#888';
+    const bg = bgColors[sentiment] || '#f5f5f5';
+    const lbl = labels[sentiment] || '';
+    return `
+    <div class="sent-story"${s.url ? ` onclick="window.open('${s.url}','_blank')"` : ''} style="border-left: 3px solid ${col};">
+      <div class="sent-story-top">
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:2px 7px;border-radius:3px;background:${bg};color:${col};">${lbl}</span>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span class="sent-story-date">${s.date}</span>
+          ${s.url ? linkIcon : ''}
+        </div>
+      </div>
+      <div class="sent-story-headline">${s.headline}</div>
+      <div class="sent-story-summary">${s.summary}</div>
+      <div class="sent-story-footer">
+        <span class="sent-story-source">${s.source}</span>
+      </div>
+    </div>`;
+  };
+
+  // Default story cards (overview, all positive)
+  const overviewCards = sd.stories.map(s => `
+    <div class="sent-story"${s.url ? ` onclick="window.open('${s.url}','_blank')"` : ''}>
+      <div class="sent-story-top">
+        <span class="sent-story-tag">${s.tag}</span>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span class="sent-story-date">${s.date}</span>
+          ${s.url ? linkIcon : ''}
+        </div>
+      </div>
+      <div class="sent-story-headline">${s.headline}</div>
+      <div class="sent-story-summary">${s.summary}</div>
+      <div class="sent-story-footer">
+        <span class="sent-story-source">${s.source}</span>
+      </div>
+    </div>`).join('');
+
+  // Drill-down cards when a mechanism is selected
+  let drilldownHtml = '';
+  if (selectedMechanism && sd.storiesByMechanism && sd.storiesByMechanism[selectedMechanism]) {
+    const ms = sd.storiesByMechanism[selectedMechanism];
+    const total = (ms.positive||[]).length + (ms.neutral||[]).length + (ms.negative||[]).length;
+    drilldownHtml = `
+      <div style="margin: 10px 0 6px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#6a6aaa;">
+        ${selectedMechanism} · ${total} stories
+      </div>
+      ${(ms.positive||[]).map(s => storyCard(s, 'positive')).join('')}
+      ${(ms.neutral||[]).map(s => storyCard(s, 'neutral')).join('')}
+      ${(ms.negative||[]).map(s => storyCard(s, 'negative')).join('')}`;
+  }
+
+  const storySection = selectedMechanism && drilldownHtml
+    ? drilldownHtml
+    : `<div class="signals-section-label">${sd.stories.length} stories · ${sd.period}</div>${overviewCards}`;
+
+  return `
+    <div class="signals-scroll">
+      <!-- Overall -->
+      <div class="sent-heading">${sd.overallLabel}</div>
+      <div class="sent-bar-row">
+        <span class="sent-bar-label" style="width:130px;font-weight:700;color:#3d3d8f;">${sd.overall.positive}% positive</span>
+        <div class="sent-bar-stacked">
+          <div class="sent-pos" style="width:${sd.overall.positive}%"></div>
+          <div class="sent-neu" style="width:${sd.overall.neutral}%"></div>
+          <div class="sent-neg" style="width:${sd.overall.negative}%"></div>
+        </div>
+        <span class="sent-count">${sd.totalMentions}</span>
+      </div>
+      <div class="sent-legend">
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#2a8a5a"></div>Positive</div>
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#d4c060"></div>Neutral</div>
+        <div class="sent-legend-item"><div class="sent-dot" style="background:#c04040"></div>Negative</div>
+      </div>
+      <div class="sent-source-note">${sd.source} · ${sd.period} · editorial-weighted · mentions column</div>
+
+      <hr class="sent-divider">
+
+      <!-- By mechanism — click to drill down -->
+      <div class="sent-heading">${sd.mechanismHeading} <span style="font-size:9px;font-weight:400;color:#bbb;text-transform:none;letter-spacing:0;">· tap to see stories</span></div>
+      ${mechBars}
+
+      <hr class="sent-divider">
+
+      <!-- Key territories -->
+      <div class="sent-heading">Key territories</div>
+      ${sd.territories.map(t => barRow(t.label, t, '80px')).join('')}
+
+      <hr class="sent-divider">
+
+      <!-- Peer set -->
+      <div class="sent-heading">${sd.peersHeading}</div>
+      ${sd.peers.map(c => barRow(c.label, c, '130px')).join('')}
+
+      <hr class="sent-divider">
+
+      ${storySection}
+    </div>`;
+}
+
+// ================================================================
+// MONTH BUTTONS
+// ================================================================
+function buildMonthSelector() {
+  const container = document.getElementById('monthSelector');
+  container.innerHTML = '';
+  for (const m of MONTHS) {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn'
+      + (m === currentMonth ? ' active' : '')
+      + (FUTURE_MONTHS.includes(m) ? ' future' : '');
+    btn.textContent = FUTURE_MONTHS.includes(m) ? m + ' (pending)' : m;
+    btn.onclick = () => {
+      if (FUTURE_MONTHS.includes(m)) return;
+      currentMonth = m;
+      buildMonthSelector();
+      drawRadar();
+      drawScoreCards();
+      if (selectedShift) renderPanel(selectedShift);
+    };
+    container.appendChild(btn);
+  }
+}
+
+// ================================================================
+// INIT
+// ================================================================
+buildMonthSelector();
+drawRadar();
+drawScoreCards();
+</script>
+
+<div class="demo-note">
+  <strong>Illustrative demo.</strong> The pipeline, scoring model and report structure are the live system. The signals,
+  scores and sentiment figures shown here are constructed to illustrate what MTN's instance would surface once its source
+  list and monitoring feed are connected. Outlets named are real; individual entries are not live intelligence.
+</div>
+
+</body>
+</html>
